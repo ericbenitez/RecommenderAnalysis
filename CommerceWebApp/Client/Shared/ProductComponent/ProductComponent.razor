@@ -1,0 +1,22 @@
+@inherits CommerceWebApp.Client.Shared.ProductBase
+@using CommerceWebApp.Shared
+
+<button onclick=@(() => SetPage.InvokeAsync(ProductPage.Products))>Back</button>
+<pre></pre>
+<table>
+    <thead>
+        <tr>
+            <th class="table-data">Name</th>
+            <th class="table-data">Price</th>
+            <th class="table-data">Stock</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr>
+            <td>@(Product!.Name)</td>
+            <td>@(Product!.Price)</td>
+            <td>@(Product!.Stock)</td>
+        </tr>
+    </tbody>
+</table>

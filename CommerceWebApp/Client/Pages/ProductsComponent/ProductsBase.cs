@@ -7,21 +7,23 @@ namespace CommerceWebApp.Client.Pages.Products
     public class ProductsBase : ComponentBase
     {
         [Inject]
-        protected HttpClient? HttpClient { get; set; }
+        protected HttpClient? httpClient { get; set; }
 
         protected IEnumerable<Product>? Products;
-        protected string ProductName = "";
+        protected string SearchText = "";
         protected bool InStockOnly = false;
+
+        protected ProductPage CurrentPage = ProductPage.Products;
         protected Product? CurrentProduct;
 
         protected override async Task OnInitializedAsync()
         {
-            Products = await HttpClient!.GetFromJsonAsync<List<Product>>("api/products");
+            Products = await httpClient!.GetFromJsonAsync<List<Product>>("api/products");
         }
 
-        protected void SetProductName(ChangeEventArgs input)
+        protected void SetSearchText(ChangeEventArgs input)
         {
-            ProductName = input.Value!.ToString()!;
+            SearchText = input.Value!.ToString()!;
         }
 
         protected void ToggleInStockOnly()
@@ -29,9 +31,17 @@ namespace CommerceWebApp.Client.Pages.Products
             this.InStockOnly = !this.InStockOnly;
         }
 
-        protected static void ViewProduct(int productId)
+        public void SetPage(ProductPage page)
         {
-            Console.WriteLine("attempting to view product " + productId);
+            this.SearchText = "";
+            this.InStockOnly = false;
+
+            this.CurrentPage = page;
+        }
+
+        protected void SetCurrentProduct(Product? product)
+        {
+            this.CurrentProduct = product;
         }
 
         protected IEnumerable<Product> GetProducts()
@@ -40,19 +50,17 @@ namespace CommerceWebApp.Client.Pages.Products
 
             filteredProducts = filteredProducts.Where(product =>
             {
-                bool productNameFilter = (this.ProductName == "")
+                bool searchFilter = (this.SearchText == "")
                     ? true
-                    : product.Name!.ToLower().StartsWith(this.ProductName.ToLower())
-                        || product.Price.ToString().StartsWith(this.ProductName.ToLower())
-                        || product.Stock.ToString().StartsWith(this.ProductName.ToLower());
+                    : product.Name!.ToLower().StartsWith(this.SearchText.ToLower())
+                        || product.Price.ToString().StartsWith(this.SearchText.ToLower())
+                        || product.Stock.ToString().StartsWith(this.SearchText.ToLower());
 
                 bool inStockFilter = (this.InStockOnly)
-                    ? (product.Stock > 0)
-                        ? true
-                        : false
+                    ? product.Stock > 0
                     : true;
 
-                return productNameFilter && inStockFilter;
+                return searchFilter && inStockFilter;
             });
 
 

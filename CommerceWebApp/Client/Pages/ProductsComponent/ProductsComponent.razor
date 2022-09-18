@@ -1,0 +1,58 @@
+@page "/products"
+@inherits CommerceWebApp.Client.Pages.Products.ProductsBase
+@using CommerceWebApp.Shared
+
+@switch (CurrentPage)
+{
+    case ProductPage.Products:
+        <button>Create Product</button>
+        <pre></pre>
+        <input type="text" placeholder="Find Product" @oninput=SetSearchText />
+        <br>
+        <label>In-stock only</label>
+        <input type="checkbox" @onclick=ToggleInStockOnly style="vertical-align: middle" />
+        <pre></pre>
+
+        IEnumerable<Product> products = GetProducts();
+        if (products.Count() > 0)
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th class="table-data">Name</th>
+                        <th class="table-data">Price</th>
+                        <th class="table-data">Stock</th>
+                        <th class="table-data"></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (Product product in products)
+                    {
+                        <tr>
+                            <td>@(product.Name)</td>
+                            <td>@(product.Price)</td>
+                            <td>@(product.Stock)</td>
+                            <td>
+                                <button @onclick=@(() => { SetCurrentProduct(product); SetPage(ProductPage.Product); })>View</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        else
+        {
+            <b>No results</b>
+        }
+        <br>
+        break;
+
+    case ProductPage.Product:
+        <CommerceWebApp.Client.Shared.ProductComponent.ProductComponent Product=@(CurrentProduct) SetPage=@(SetPage) />
+        break;
+
+    case ProductPage.CreateProduct:
+        break;
+}

@@ -1,4 +1,5 @@
 using CommerceWebApp.Shared;
+using CommerceWebApp.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -8,20 +9,21 @@ namespace CommerceWebApp.Server.Controllers
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase
     {
-        private readonly ILogger<ProductsController> _logger;
+        private readonly ProductsService productsService;
 
         public ProductsController(
-            ILogger<ProductsController> logger
-        )
-        {
-            _logger = logger;
+            ProductsService productsService
+        ) {
+            this.productsService = productsService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            string json = await System.IO.File.ReadAllTextAsync("Data/products.json");
-            IEnumerable<Product> products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json)!; // we deserialize it in order to map to our version of `Product`
+            IEnumerable<Product> products = await Task.Run(() => {
+                return this.productsService.Products;
+            });
+            
             return StatusCode(200, JsonConvert.SerializeObject(products));
         }
     }

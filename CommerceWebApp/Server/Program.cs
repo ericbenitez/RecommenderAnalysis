@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.ResponseCompression;
+using CommerceWebApp.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+builder.Services.AddSingleton<ProductsService>();
 
 var app = builder.Build();
 
