@@ -1,9 +1,87 @@
 ﻿@page "/"
+@inject HttpClient httpClient
+@using CommerceWebApp.Shared
 
-<PageTitle>Index</PageTitle>
+<input type="text" placeholder="Product Name" @oninput=setProductName/>
+<br>
+In-stock only <input type="checkbox" @onclick=toggleInStockOnly style="vertical-align: middle"/>
+<pre></pre>
 
-<h1>Hello, world!</h1>
+<table>
+    <thead>
+        <tr>
+            <th class="table-data">Name</th>
+            <th class="table-data">Price</th>
+            <th class="table-data">Stock</th>
+            <th class="table-data"></th>
+        </tr>
+    </thead>
 
-Welcome to your new app.
+    <tbody>
+        @foreach (Product product in getProducts())
+        {
+            <tr>
+                <td>@(product.name)</td>
+                <td>@(product.price)</td>
+                <td>@(product.stock)</td>
+                <td>
+                    <button @onclick=@(() => viewProduct(product.id))>View</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<br>
+
+@code {
+    private IEnumerable<Product>? products;
+    private string productName = "";
+    private bool inStockOnly = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+        products = await httpClient.GetFromJsonAsync<List<Product>>("api/products");
+    }
+
+    private void setProductName(ChangeEventArgs input)
+    {
+        productName = input.Value!.ToString()!;
+    }
+
+    private void toggleInStockOnly()
+    {
+        this.inStockOnly = !this.inStockOnly;
+    }
+
+    private void viewProduct(int productId)
+    {
+        Console.WriteLine("attempting to view product " + productId);
+    }
+
+    private IEnumerable<Product> getProducts()
+    {
+        IEnumerable<Product> filteredProducts = this.products ?? new List<Product>();
+        
+        filteredProducts = filteredProducts.Where(product => {
+            bool productNameFilter = (this.productName == "") 
+                ? true
+                : product.name!.ToLower().StartsWith(this.productName.ToLower())
+                    || product.price.ToString().StartsWith(this.productName.ToLower())
+                    || product.stock.ToString().StartsWith(this.productName.ToLower());
+
+            bool inStockFilter = (this.inStockOnly)
+                ? (product.stock > 0)
+                    ? true
+                    : false
+                : true;
+
+            return productNameFilter && inStockFilter;
+        });
+
+
+        return filteredProducts;
+    }
+}
+
