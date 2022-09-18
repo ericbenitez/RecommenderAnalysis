@@ -2,11 +2,11 @@ namespace CommerceWebApp.Shared
 {
     public class Product
     {
-        public string? name {get; set; }
-        public int price { get; set; }
-        public int stock { get; set; }
-        public int id { get; set; }
-        public List<string> reviews = new();
-        public Dimensions? dimensions {get; set; }
+        public string? Name { get; set; }
+        public int Id { get; set; }
+        public int Price { get; set; }
+        public int Stock { get; set; }
+        public Dimensions? Dimensions { get; set; }
+        public List<string> Reviews = new();
     }
 }

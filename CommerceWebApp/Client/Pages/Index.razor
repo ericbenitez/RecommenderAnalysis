@@ -1,23 +1,9 @@
 ﻿@page "/"
-@using CommerceWebApp.Shared
-
-@switch (currentPage)
-{
-    case Page.PRODUCTS:
-        <CommerceWebApp.Client.Pages.Products.Products/>
-        break;
-
-    default:
-        <CommerceWebApp.Client.Pages.Products.Products/>
-        break;
-}
+@inject NavigationManager NavigationManager
 
 @code {
-    private Page currentPage = Page.PRODUCTS;
-
-    public void setCurrentPage(Page page)
+    protected override void OnInitialized()
     {
-        this.currentPage = page;
-        StateHasChanged();
+        NavigationManager.NavigateTo("/products");
     }
 }
