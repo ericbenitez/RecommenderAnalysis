@@ -1,6 +1,6 @@
 namespace CommerceWebApp.Shared
 {
-    enum Page
+    public enum Page
     {
         PRODUCTS,
         PRODUCT,
