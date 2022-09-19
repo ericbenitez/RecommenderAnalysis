@@ -3,11 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommerceWebApp.Server", "CommerceWebApp\Server\CommerceWebApp.Server.csproj", "{5D6E0259-F3AA-48EE-B850-F5E42E8C9DEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommerceWebApp.Server", "CommerceWebApp\Server\CommerceWebApp.Server.csproj", "{5D6E0259-F3AA-48EE-B850-F5E42E8C9DEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommerceWebApp.Client", "CommerceWebApp\Client\CommerceWebApp.Client.csproj", "{8096CD37-FB25-4F09-8D43-B312C2877D8C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommerceWebApp.Client", "CommerceWebApp\Client\CommerceWebApp.Client.csproj", "{8096CD37-FB25-4F09-8D43-B312C2877D8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommerceWebApp.Shared", "CommerceWebApp\Shared\CommerceWebApp.Shared.csproj", "{9AC697E3-7D88-40E7-8C73-69355ED89EB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommerceWebApp.Shared", "CommerceWebApp\Shared\CommerceWebApp.Shared.csproj", "{9AC697E3-7D88-40E7-8C73-69355ED89EB1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2091FEBC-78F8-4FE5-970D-0A5FC274268C}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
