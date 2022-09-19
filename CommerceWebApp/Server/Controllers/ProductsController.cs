@@ -63,7 +63,7 @@ namespace CommerceWebApp.Server.Controllers
             }
         }
 
-        [HttpPost("createProduct")]
+        [HttpPost("create")]
         public async Task<IActionResult> CreateProduct([FromBody] Product product)
         {
             bool createdProduct = await Task.Run(() => {
@@ -75,11 +75,11 @@ namespace CommerceWebApp.Server.Controllers
                 StatusCode(400, "Could not create Product");
         }
 
-        [HttpPost("submitReview")]
-        public async Task<IActionResult> SubmitReview([FromBody] ReviewDto reviewDto)
+        [HttpPost("{id}/reviews/submit")]
+        public async Task<IActionResult> SubmitReview(int id, [FromBody] string review)
         {
             bool submittedReview = await Task.Run(() => {
-                return this.productsService.SubmitReview(reviewDto);
+                return this.productsService.SubmitReview(id, review);
             });
 
             return submittedReview ?

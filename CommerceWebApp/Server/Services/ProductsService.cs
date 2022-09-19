@@ -27,12 +27,12 @@ namespace CommerceWebApp.Server.Services
             return false;
         }
 
-        public bool SubmitReview(ReviewDto reviewDto)
+        public bool SubmitReview(int id, string review)
         {
-            Product? product = this.Products.Find(product => product.Id == reviewDto.Id);
-            if (product != null && reviewDto.Review != null)
+            Product? product = this.Products.Find(product => product.Id == id);
+            if (product != null && review != "")
             {
-                product.Reviews.Add(reviewDto.Review);
+                product.Reviews.Add(review);
                 return true;
             }
 
