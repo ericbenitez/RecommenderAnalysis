@@ -25,3 +25,23 @@
         </tr>
     </tbody>
 </table>
+<pre></pre>
+
+<label>Review: </label>
+<input type="range" list="tickmarks" min="0" max="10" step="1" value="5" @oninput=SetCurrentReview/>
+<datalist id="tickmarks">
+<option value="0"></option>
+<option value="1"></option>
+<option value="2"></option>
+<option value="3"></option>
+<option value="4"></option>
+<option value="5"></option>
+<option value="6"></option>
+<option value="7"></option>
+<option value="8"></option>
+<option value="9"></option>
+<option value="10"></option>
+</datalist>
+<label>@(CurrentReview)</label>
+<br>
+<button @onclick=SubmitReview>Submit</button>

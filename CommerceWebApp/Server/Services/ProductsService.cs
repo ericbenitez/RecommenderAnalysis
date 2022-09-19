@@ -13,19 +13,30 @@ namespace CommerceWebApp.Server.Services
             this.Products = JsonConvert.DeserializeObject<List<Product>>(json)!;
         }
 
-        public Product? AddProduct(Product product)
+        public bool AddProduct(Product product)
         {
             bool isDataValid = product.Name != null && product.Dimensions != null;
             bool notExists = !this.Products.Exists(someProduct => someProduct.Id == product.Id);
 
             if (isDataValid && notExists)
             {
-                Console.WriteLine("added it");
                 this.Products.Add(product);
-                return product;
+                return true;
             }
-            Console.WriteLine("someting went wrong");
-            return null;
+            
+            return false;
+        }
+
+        public bool SubmitReview(ReviewDto reviewDto)
+        {
+            Product? product = this.Products.Find(product => product.Id == reviewDto.Id);
+            if (product != null && reviewDto.Review != null)
+            {
+                product.Reviews.Add(reviewDto.Review);
+                return true;
+            }
+
+            return false;
         }
     }
 }
