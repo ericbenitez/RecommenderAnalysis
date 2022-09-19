@@ -9,7 +9,7 @@ namespace CommerceWebApp.Client.Pages.Products
         [Inject]
         protected HttpClient? httpClient { get; set; }
 
-        protected IEnumerable<Product>? Products;
+        protected List<Product>? Products;
         protected string SearchText = "";
         protected bool InStockOnly = false;
 
@@ -18,12 +18,12 @@ namespace CommerceWebApp.Client.Pages.Products
 
         protected override async Task OnInitializedAsync()
         {
-            Products = await httpClient!.GetFromJsonAsync<List<Product>>("api/products");
+            this.Products = await httpClient!.GetFromJsonAsync<List<Product>>("api/products");
         }
 
         protected void SetSearchText(ChangeEventArgs input)
         {
-            SearchText = input.Value!.ToString()!;
+            this.SearchText = input.Value!.ToString()!;
         }
 
         protected void ToggleInStockOnly()
@@ -31,12 +31,14 @@ namespace CommerceWebApp.Client.Pages.Products
             this.InStockOnly = !this.InStockOnly;
         }
 
-        public void SetPage(ProductPage page)
+        public async void SetPage(ProductPage page)
         {
             this.SearchText = "";
             this.InStockOnly = false;
 
             this.CurrentPage = page;
+            this.Products = await httpClient!.GetFromJsonAsync<List<Product>>("api/products");
+            StateHasChanged();
         }
 
         protected void SetCurrentProduct(Product? product)

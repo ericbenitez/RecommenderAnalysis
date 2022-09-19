@@ -5,12 +5,12 @@
 @switch (CurrentPage)
 {
     case ProductPage.Products:
-        <button>Create Product</button>
+        <button @onclick=@(() => SetPage(ProductPage.CreateProduct))>Create Product</button>
         <pre></pre>
         <input type="text" placeholder="Find Product" @oninput=SetSearchText />
         <br>
         <label>In-stock only</label>
-        <input type="checkbox" @onclick=ToggleInStockOnly style="vertical-align: middle" />
+        <input type="checkbox" @onclick=ToggleInStockOnly style="vertical-align: middle;" />
         <pre></pre>
 
         IEnumerable<Product> products = GetProducts();
@@ -34,7 +34,10 @@
                             <td>@(product.Price)</td>
                             <td>@(product.Stock)</td>
                             <td>
-                                <button @onclick=@(() => { SetCurrentProduct(product); SetPage(ProductPage.Product); })>View</button>
+                                <button @onclick=@(() => { 
+                                    SetCurrentProduct(product); 
+                                    SetPage(ProductPage.Product); 
+                                })>View</button>
                             </td>
                         </tr>
                     }
@@ -50,9 +53,10 @@
         break;
 
     case ProductPage.Product:
-        <CommerceWebApp.Client.Shared.ProductComponent.ProductComponent Product=@(CurrentProduct) SetPage=@(SetPage) />
+        <CommerceWebApp.Client.Shared.ProductComponent.ProductComponent Product=CurrentProduct SetPage=SetPage />
         break;
 
     case ProductPage.CreateProduct:
+        <CommerceWebApp.Client.Shared.CreateProductComponent.CreateProductComponent SetPage=SetPage />
         break;
 }

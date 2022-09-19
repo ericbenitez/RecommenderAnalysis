@@ -17,14 +17,26 @@ namespace CommerceWebApp.Server.Controllers
             this.productsService = productsService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get()
+        [HttpGet("")]
+        public async Task<IActionResult> GetProducts()
         {
             IEnumerable<Product> products = await Task.Run(() => {
                 return this.productsService.Products;
             });
             
             return StatusCode(200, JsonConvert.SerializeObject(products));
+        }
+
+        [HttpPost("createProduct")]
+        public async Task<IActionResult> CreateProduct([FromBody] Product product)
+        {
+            Product? createdProduct = await Task.Run(() => {
+                return this.productsService.AddProduct(product);
+            });
+
+            return createdProduct != null ? 
+                StatusCode(200, "Created Product successfully") :
+                StatusCode(400, "Could not create Product");
         }
     }
 }

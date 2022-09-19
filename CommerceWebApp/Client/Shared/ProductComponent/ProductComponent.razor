@@ -1,5 +1,6 @@
 @inherits CommerceWebApp.Client.Shared.ProductBase
 @using CommerceWebApp.Shared
+@using Newtonsoft.Json
 
 <button onclick=@(() => SetPage.InvokeAsync(ProductPage.Products))>Back</button>
 <pre></pre>
@@ -7,16 +8,20 @@
     <thead>
         <tr>
             <th class="table-data">Name</th>
+            <th class="table-data">Id</th>
             <th class="table-data">Price</th>
             <th class="table-data">Stock</th>
+            <th class="table-data">Dimensions</th>
         </tr>
     </thead>
 
     <tbody>
         <tr>
             <td>@(Product!.Name)</td>
+            <td>@(Product!.Id)</td>
             <td>@(Product!.Price)</td>
             <td>@(Product!.Stock)</td>
+            <td>@(JsonConvert.SerializeObject(Product!.Dimensions))</td>
         </tr>
     </tbody>
 </table>

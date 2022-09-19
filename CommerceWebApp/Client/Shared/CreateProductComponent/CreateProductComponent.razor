@@ -1,0 +1,22 @@
+@inherits CommerceWebApp.Client.Shared.CreateProductBase
+@using CommerceWebApp.Shared
+
+<button onclick=@(() => SetPage.InvokeAsync(ProductPage.Products))>Back</button>
+<pre></pre>
+
+<table>
+    <thead>
+        <tr>
+            <th class="table-data">Create Product</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr>
+            <td style="height: 300px; width: 300px; position: relative">
+                <textarea style="height: calc(100% - 20px); width: 100%; padding: 0px; border: none; resize: none; background-color: transparent; outline: none; top: 0px; position: absolute" placeholder="Enter Product JSON" @oninput=SetJSONText></textarea>
+                <button style="height: 20px; width: 100%; bottom: 0px; position: absolute; border-top-width: 2px; border-left-width: 0px; border-right-width: 0px; border-bottom-width: 0px" @onclick=SubmitJSON>Submit</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
