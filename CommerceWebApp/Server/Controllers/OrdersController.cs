@@ -11,11 +11,14 @@ namespace CommerceWebApp.Server.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly ProductsService productsService;
+        private readonly OrdersService ordersService;
 
         public OrdersController(
-            ProductsService productsService
+            ProductsService productsService,
+            OrdersService ordersService
         ) {
             this.productsService = productsService;
+            this.ordersService = ordersService;
         }
 
         [HttpPost("")]
@@ -39,10 +42,18 @@ namespace CommerceWebApp.Server.Controllers
                     if (product.Stock < quantity)
                         return StatusCode(409, $"Not enough in stock for product Id: {productId}");
                 
-                    product.Stock-=quantity;
-                    // update it
+                    product.Stock -= quantity;
+                    var result = this.productsService.ProductsCollection.ReplaceOne(
+                        someProduct => someProduct.Id == product.Id,
+                        product,
+                        new ReplaceOptions {IsUpsert = true}
+                    );
+
+                    if (!result.IsAcknowledged)
+                        return StatusCode(404, $"Error with database when updating quantity of product Id: {productId}");
                 }
-                // push order to database
+
+                this.ordersService.OrdersCollection.InsertOne(order);
                 return StatusCode(201, "Order created");
             }
 

@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.ResponseCompression;
 using CommerceWebApp.Server.Services;
-using Microsoft.OpenApi;
-using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,13 +11,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<ProductsService>();
-
-
-MongoClient mongoClient = new MongoClient("mongodb://localhost:27017");
-mongoClient.DropDatabase("CommerceWebApp");
-IMongoDatabase database = mongoClient.GetDatabase("CommerceWebApp");
-database.CreateCollection("Products");
-database.CreateCollection("Orders");
 
 var app = builder.Build();
 
