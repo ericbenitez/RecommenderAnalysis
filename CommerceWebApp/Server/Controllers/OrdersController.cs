@@ -21,6 +21,32 @@ namespace CommerceWebApp.Server.Controllers
             this.ordersService = ordersService;
         }
 
+        [HttpGet("")]
+        public async Task<IActionResult> GetOrders()
+        {
+            IEnumerable<Order> orders = await Task.Run(() => {
+                return this.ordersService.OrdersCollection.AsQueryable();
+            });
+
+            return StatusCode(200, JsonConvert.SerializeObject(orders));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOrder(int id)
+        {
+            Order? order = await Task.Run(() => {
+                IEnumerable<Order> orders = this.ordersService.OrdersCollection.AsQueryable();
+                if (orders.Count() < id)
+                    return null;
+
+                return orders.ToArray()[id];
+            });
+
+            return order != null ?
+                StatusCode(200, JsonConvert.SerializeObject(order)):
+                StatusCode(404, "Could not find order");
+        }
+
         [HttpPost("")]
         public async Task<IActionResult> PostOrder([FromBody] Order order)
         {
