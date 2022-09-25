@@ -7,7 +7,7 @@ using MongoDB.Driver;
 namespace CommerceWebApp.Server.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/products")]
     public class ProductsController : ControllerBase
     {
         private readonly ProductsService productsService;
