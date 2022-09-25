@@ -2,6 +2,7 @@ using CommerceWebApp.Shared;
 using CommerceWebApp.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using MongoDB.Driver;
 
 namespace CommerceWebApp.Server.Controllers
 {
@@ -21,7 +22,7 @@ namespace CommerceWebApp.Server.Controllers
         public async Task<IActionResult> GetProducts()
         {
             IEnumerable<Product> products = await Task.Run(() => {
-                return this.productsService.Products;
+                return this.productsService.ProductsCollection.AsQueryable();
             });
             
             return StatusCode(200, JsonConvert.SerializeObject(products));
@@ -31,7 +32,7 @@ namespace CommerceWebApp.Server.Controllers
         public async Task<IActionResult> GetProduct(int id)
         {
             Product? product = await Task.Run(() => {
-                return this.productsService.Products.Find(product => product.Id == id);
+                return this.productsService.ProductsCollection.Find(product => product.Id == id).FirstOrDefault();
             });
 
             if (product != null)
@@ -49,7 +50,7 @@ namespace CommerceWebApp.Server.Controllers
         public async Task<IActionResult> GetProductReviews(int id)
         {
             Product? product = await Task.Run(() => {
-                return this.productsService.Products.Find(product => product.Id == id);
+                return this.productsService.ProductsCollection.Find(product => product.Id == id).FirstOrDefault();
             });
 
             if (product != null)
