@@ -6,7 +6,6 @@ namespace CommerceWebApp.Server.Services
 {
     public class ProductsService
     {
-        private IMongoDatabase Database;
         public IMongoCollection<Product> ProductsCollection;
 
         public ProductsService()
@@ -14,13 +13,9 @@ namespace CommerceWebApp.Server.Services
             string json = System.IO.File.ReadAllText("Data/products.json");
             List<Product> products = JsonConvert.DeserializeObject<List<Product>>(json)!;
 
-            MongoClient mongoClient = new MongoClient("mongodb://localhost:27017");
-            mongoClient.DropDatabase("CommerceWebApp");
+            IMongoDatabase database = new MongoClient("mongodb://localhost:27017").GetDatabase("CommerceWebApp");
+            this.ProductsCollection = database.GetCollection<Product>("Products");
 
-            this.Database = mongoClient.GetDatabase("CommerceWebApp");
-            this.Database.CreateCollection("Products");
-
-            this.ProductsCollection = this.Database.GetCollection<Product>("Products");
             foreach(Product product in products)
             {
                 this.ProductsCollection.InsertOne(product);
