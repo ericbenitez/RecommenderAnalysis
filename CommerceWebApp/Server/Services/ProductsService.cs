@@ -13,14 +13,14 @@ namespace CommerceWebApp.Server.Services
             IMongoDatabase database = new MongoClient("mongodb://localhost:27017").GetDatabase("CommerceWebApp");
             this.ProductsCollection = database.GetCollection<Product>("Products");
 
-            database.DropCollection("Products");
-            this.ProductsCollection = database.GetCollection<Product>("Products");
-            string json = System.IO.File.ReadAllText("Data/products.json");
-            List<Product> products = JsonConvert.DeserializeObject<List<Product>>(json)!;
-            foreach(Product product in products)
-            {
-                this.ProductsCollection.InsertOne(product);
-            }
+            // database.DropCollection("Products");
+            // this.ProductsCollection = database.GetCollection<Product>("Products");
+            // string json = System.IO.File.ReadAllText("Data/products.json");
+            // List<Product> products = JsonConvert.DeserializeObject<List<Product>>(json)!;
+            // foreach(Product product in products)
+            // {
+            //     this.ProductsCollection.InsertOne(product);
+            // }
         }
 
         public bool AddProduct(Product product)

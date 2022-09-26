@@ -25,7 +25,7 @@ namespace CommerceWebApp.Server.Controllers
         public async Task<IActionResult> GetOrders()
         {
             IEnumerable<Order> orders = await Task.Run(() => {
-                return this.ordersService.OrdersCollection.AsQueryable();
+                return this.ordersService.OrdersCollection.Find(_ => true).ToList();
             });
 
             return StatusCode(200, JsonConvert.SerializeObject(orders));
@@ -35,8 +35,8 @@ namespace CommerceWebApp.Server.Controllers
         public async Task<IActionResult> GetOrder(int index)
         {
             Order? order = await Task.Run(() => {
-                IEnumerable<Order> orders = this.ordersService.OrdersCollection.AsQueryable();
-                if (orders.Count() < index)
+                IEnumerable<Order> orders = this.ordersService.OrdersCollection.Find(_ => true).ToList();
+                if (orders.Count() - 1 < index || index < 0)
                     return null;
 
                 return orders.ToArray()[index];
@@ -53,12 +53,12 @@ namespace CommerceWebApp.Server.Controllers
             if (order.Name != null && order.Products != null)
             {
                 IEnumerable<Product> products = await Task.Run(() => {
-                   return this.productsService.ProductsCollection.AsQueryable(); 
+                   return this.productsService.ProductsCollection.Find(_ => true).ToList(); 
                 });
 
                 foreach (var (productId, quantity) in order.Products)
                 {
-                    Product? product = products.FirstOrDefault(product => product.Id == productId);
+                    Product? product = products.FirstOrDefault(product => product.Id.ToString() == productId);
                     if (product == null)
                         return StatusCode(409, $"There is no product with Id: {productId}");
                     
