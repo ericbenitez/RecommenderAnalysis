@@ -31,15 +31,15 @@ namespace CommerceWebApp.Server.Controllers
             return StatusCode(200, JsonConvert.SerializeObject(orders));
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetOrder(int id)
+        [HttpGet("{index}")]
+        public async Task<IActionResult> GetOrder(int index)
         {
             Order? order = await Task.Run(() => {
                 IEnumerable<Order> orders = this.ordersService.OrdersCollection.AsQueryable();
-                if (orders.Count() < id)
+                if (orders.Count() < index)
                     return null;
 
-                return orders.ToArray()[id];
+                return orders.ToArray()[index];
             });
 
             return order != null ?
