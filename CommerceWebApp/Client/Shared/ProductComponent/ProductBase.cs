@@ -26,7 +26,7 @@ namespace CommerceWebApp.Client.Shared
         protected async Task SubmitReview()
         {
             StringContent content = new StringContent(JsonConvert.SerializeObject(this.CurrentReview), Encoding.UTF8, "application/json");
-            await httpClient!.PostAsync($"api/products/{this.Product!.Id}/reviews/submit", content);
+            await httpClient!.PostAsync($"api/products/{this.Product!.Id}/reviews/", content);
             await this.SetPage.InvokeAsync(ProductPage.Products);
             this.CurrentReview = "5";
         }

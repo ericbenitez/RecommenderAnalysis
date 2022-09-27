@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.ResponseCompression;
 using CommerceWebApp.Server.Services;
-using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<ProductsService>();
+builder.Services.AddSingleton<OrdersService>();
 
 var app = builder.Build();
 

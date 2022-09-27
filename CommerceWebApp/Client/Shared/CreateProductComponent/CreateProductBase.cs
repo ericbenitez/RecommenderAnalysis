@@ -24,7 +24,7 @@ namespace CommerceWebApp.Client.Shared
         {
             Product? product = JsonConvert.DeserializeObject<Product>(this.JSONText);
             StringContent content = new StringContent(JsonConvert.SerializeObject(product), Encoding.UTF8, "application/json");
-            await httpClient!.PostAsync("api/products/createProduct", content);
+            await httpClient!.PostAsync("api/products/", content);
             await this.SetPage.InvokeAsync(ProductPage.Products);
             this.JSONText = "";
         }
