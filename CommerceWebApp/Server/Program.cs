@@ -10,8 +10,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<ProductsService>();
-builder.Services.AddSingleton<OrdersService>();
+// builder.Services.AddSingleton<ProductsService>();
+builder.Services.AddSingleton<CrawlerService>(new CrawlerService());
 
 var app = builder.Build();
 
@@ -40,6 +40,7 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();
+
 app.MapFallbackToFile("index.html");
 
 app.Run();
