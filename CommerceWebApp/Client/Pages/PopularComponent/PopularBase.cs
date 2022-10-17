@@ -10,14 +10,13 @@ namespace CommerceWebApp.Client.Pages.PopularComponent
     {
         [Inject]
         protected HttpClient? httpClient { get; set; }
-
+        
         protected IEnumerable<Page>? PopularPages { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
             var result = await httpClient!.GetAsync("api/crawler/popular");
-            var ok = await result.Content.ReadAsStringAsync();
-            this.PopularPages = JsonConvert.DeserializeObject<IEnumerable<Page>>(ok);
+            this.PopularPages = JsonConvert.DeserializeObject<IEnumerable<Page>>(await result.Content.ReadAsStringAsync());
         }
     }
 }

@@ -22,19 +22,20 @@ namespace CommerceWebApp.Server.Controllers
         [HttpGet("popular")]
         public async Task<IActionResult> GetPopular()
         {
-            List<DbPage> pages = await Task.Run(() =>
+            List<Page> pages = await Task.Run(() =>
             {
                 return this.crawlerService.PagesCollection.AsQueryable().ToList();
             });
 
-            IEnumerable<DbPage> popularPages = pages.OrderByDescending(page => page.IncomingLinksCount).Take(10);
+            IEnumerable<Page> popularPages = pages.OrderByDescending(page => page.IncomingLinksCount).Take(10);
             return StatusCode(200, JsonConvert.SerializeObject(popularPages));
         }
 
         [HttpGet("{title}")]
         public async Task<IActionResult> GetPageByTitle(string title)
         {
-            DbPage? page = await Task.Run(() => {
+            Page? page = await Task.Run(() =>
+            {
                 return this.crawlerService.PagesCollection.Find(page => page.Title == title).FirstOrDefault();
             });
 

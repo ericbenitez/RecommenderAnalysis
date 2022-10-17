@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Abot" Version="2.0.70" />
+    <PackageReference Include="LunrCore" Version="2.3.10" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.1" />
     <PackageReference Include="MongoDB.Driver" Version="2.17.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

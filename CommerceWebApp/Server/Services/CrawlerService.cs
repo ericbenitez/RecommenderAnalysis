@@ -10,17 +10,21 @@ namespace CommerceWebApp.Server.Services
     public class CrawlerService
     {
         public bool IsCrawlCompleted = false;
-        public IMongoCollection<DbPage> PagesCollection;
+        public IMongoCollection<Page> PagesCollection;
 
         public CrawlerService()
         {
             IMongoDatabase database = new MongoClient("mongodb://localhost:27017").GetDatabase("CommerceWebApp");
-            // database.DropCollection("Pages");
-            this.PagesCollection = database.GetCollection<DbPage>("Pages");
+            database.DropCollection("Pages");
+            this.PagesCollection = database.GetCollection<Page>("Pages");
 
-            // Task.Run(async () => {
-            //     await this.Crawl();
-            // });
+            Task.Run(async () =>
+            {
+                // await this.Crawl();
+                //await this.IndexDocuments();
+            });
+
+
         }
 
         private async Task Crawl()
@@ -37,13 +41,12 @@ namespace CommerceWebApp.Server.Services
             CrawlResult crawlResult = await crawler.CrawlAsync(new Uri("https://people.scs.carleton.ca/~davidmckenney/fruitgraph/N-0.html"));
             this.IsCrawlCompleted = true;
 
-            List<DbPage> pages = this.PagesCollection.AsQueryable().ToList();
-            foreach (DbPage page in pages)
+            List<Page> pages = this.PagesCollection.AsQueryable().ToList();
+            foreach (Page page in pages)
             {
                 foreach (string outgoingLink in page.OutgoingLinks)
                 {
-
-                    DbPage? foundPage = pages.Find(somePage => somePage.Url == outgoingLink);
+                    Page? foundPage = pages.Find(somePage => somePage.Url == outgoingLink);
                     if (foundPage != null && page.Url != null)
                     {
                         foundPage.IncomingLinks.Add(page.Url);
@@ -52,7 +55,7 @@ namespace CommerceWebApp.Server.Services
                 }
             }
 
-            foreach (DbPage page in pages)
+            foreach (Page page in pages)
             {
                 if (page.Url != null)
                 {
@@ -63,13 +66,40 @@ namespace CommerceWebApp.Server.Services
                     );
                 }
             }
+        }
 
-            // IEnumerable<Page> sorted = pages.OrderByDescending(page => page.IncomingLinksCount).Take(10);
-            // foreach(Page page in sorted)
-            // {
-            //     Console.WriteLine(page.Title + ": " + page.IncomingLinksCount);
-            // }
-            Console.WriteLine("done");
+        private async Task IndexDocuments()
+        {
+            //List<Page> pages = this.PagesCollection.AsQueryable().ToList();
+
+            //var index = await Lunr.Index.Build(async builder =>
+            //{
+            //    builder
+            //        .AddField("title")
+            //        .AddField("body");
+
+            //    foreach (Page page in pages)
+            //    {
+            //        if (page.Title != null && page.Body != null && page.Id != null)
+            //        {
+            //            await builder.Add(new Lunr.Document
+            //            {
+            //                { "title", page.Title },
+            //                { "body", page.Body },
+            //                { "id", page.Id }
+            //            });
+            //        }
+
+            //    }
+
+            //});
+
+            //var ok = index.Search("banana");
+
+            //await foreach (Lunr.Result result in ok)
+            //{
+            //    Console.WriteLine(result.DocumentReference);
+            //}
         }
 
         private void PageCrawlCompleted(object? sender, PageCrawlCompletedArgs args)
@@ -81,7 +111,7 @@ namespace CommerceWebApp.Server.Services
                 {
                     IEnumerable<string> outgoingLinks = args.CrawledPage.ParsedLinks.Select(link => link.HrefValue.ToString());
 
-                    this.PagesCollection.InsertOne(new DbPage()
+                    this.PagesCollection.InsertOne(new Page
                     {
                         Url = args.CrawledPage.Uri.ToString(),
                         Title = args.CrawledPage.AngleSharpHtmlDocument.Title,
