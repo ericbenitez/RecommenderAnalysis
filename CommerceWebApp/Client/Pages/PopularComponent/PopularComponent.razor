@@ -1,0 +1,21 @@
+@page "/popular"
+@inherits CommerceWebApp.Client.Pages.PopularComponent.PopularBase
+@using CommerceWebApp.Shared
+
+@if (this.PopularPages != null)
+{
+    foreach (Page page in this.PopularPages)
+    {
+        <label>@(page.Title)</label>
+        <select>
+            @foreach (string incomingLink in page.IncomingLinks)
+            {
+                <option>@(System.IO.Path.GetFileNameWithoutExtension(incomingLink))</option>
+            }
+        </select>
+
+        <br>
+        <br>
+    }
+
+}
