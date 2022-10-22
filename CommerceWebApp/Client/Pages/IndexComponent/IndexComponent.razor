@@ -1,0 +1,32 @@
+﻿@page "/"
+@inject NavigationManager NavigationManager
+@using CommerceWebApp.Shared
+@inherits CommerceWebApp.Client.Pages.IndexComponent.IndexBase
+
+<input type="text" placeholder="Enter index text" @oninput=SetSearchText />
+<pre></pre>
+
+@if (this.IndexedPages != null && this.IndexedPages.Count() > 0)
+{
+    <table>
+        <thead>
+            <tr>
+                <th class="table-data">Title</th>
+                <th class="table-data">URL</th>
+                <th class="table-data">Search Score</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (Page page in this.IndexedPages)
+            {
+                <tr>
+                    <td>@(page.Title)</td>
+                    <td>@(page.Url)</td>
+                    <td>@(page.SearchScore)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+

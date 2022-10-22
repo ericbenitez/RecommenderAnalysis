@@ -7,12 +7,12 @@ using MongoDB.Driver;
 namespace CommerceWebApp.Server.Controllers
 {
     [ApiController]
-    [Route("api/crawler/")]
-    public class CrawlerController : ControllerBase
+    [Route("api/pages/")]
+    public class PagesController : ControllerBase
     {
         private readonly CrawlerService crawlerService;
 
-        public CrawlerController(
+        public PagesController(
             CrawlerService crawlerService
         )
         {
@@ -43,6 +43,36 @@ namespace CommerceWebApp.Server.Controllers
                 return StatusCode(200, JsonConvert.SerializeObject(page));
             else
                 return StatusCode(404, "Page not found");
+        }
+
+        [HttpGet("index/{text}")]
+        public async Task<IActionResult> GetIndexedPagesByText(string text)
+        {
+            List<Page> pages = new();
+            if (this.crawlerService.index != null)
+            {
+                var results = this.crawlerService.index.Search(text);
+
+                int count = 0;
+                int maxResults = 10;
+                await foreach (Lunr.Result result in results)
+                {
+                    if (count == maxResults) break;
+
+                    Page? page = this.crawlerService.PagesCollection.Find(page => page.Id == result.DocumentReference).FirstOrDefault();
+                    if (page != null)
+                    {
+                        page.SearchScore = result.Score;
+                        pages.Add(page);
+                        count++;
+                    }
+                }
+
+                return StatusCode(200, JsonConvert.SerializeObject(pages));
+            }
+
+            else
+                return StatusCode(404, "Index not available");
         }
     }
 }
