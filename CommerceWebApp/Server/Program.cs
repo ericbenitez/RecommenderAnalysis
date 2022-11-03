@@ -10,8 +10,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<ProductsService>();
-builder.Services.AddSingleton<OrdersService>();
+builder.Services.AddSingleton<TestService>();
 
 var app = builder.Build();
 
