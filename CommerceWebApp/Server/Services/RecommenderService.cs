@@ -47,12 +47,12 @@ namespace CommerceWebApp.Server.Services
 
         // Calculates Similarity
         public static double CalculateSimilarity(Matrix<double> matrix, int user1, int user2)
-        {   
+        {
             Matrix<double> goodMatrix = Matrix<double>.Build.Dense(matrix.RowCount, matrix.ColumnCount);
             matrix.CopyTo(goodMatrix);
-            
+
             //Remove products (columns) both users have not reviewed
-            for (int product = matrix.ColumnCount-1; product >= 0; product--)
+            for (int product = matrix.ColumnCount - 1; product >= 0; product--)
             {
                 if (matrix[user1, product] == -1 || matrix[user2, product] == -1)
                 {
@@ -60,29 +60,26 @@ namespace CommerceWebApp.Server.Services
                 }
             }
 
-            // Get the user's ratings
+            // Calculate the ratings with the bad columns removed
             var user1Ratings = goodMatrix.Row(user1);
             var user2Ratings = goodMatrix.Row(user2);
 
-            // Get the average rating for each user
+            // Calculate average
             var user1Average = matrix.Row(user1).Where(x => x > -1).ToList().Average();
             var user2Average = matrix.Row(user2).Where(x => x > -1).ToList().Average();
 
-            // Get the difference between the user's ratings and the average
+            // Substract average from ratings
             var user1Adjusted = user1Ratings.Subtract(user1Average);
             var user2Adjusted = user2Ratings.Subtract(user2Average);
 
-            // Get the dot product of the differences
+            // Dot product of numerator
             var dotProduct = user1Adjusted.DotProduct(user2Adjusted);
 
-            // Get the magnitude of the first vector
-            var magnitude1 = user1Adjusted.L2Norm();
+            // Calculate the two sections of the denominator
+            var denominator1 = user1Adjusted.L2Norm();
+            var denominator2 = user2Adjusted.L2Norm();
 
-            // Get the magnitude of the second vector
-            var magnitude2 = user2Adjusted.L2Norm();
-
-            // Calculate the cosine similarity
-            return dotProduct / (magnitude1 * magnitude2);
+            return dotProduct / (denominator1 * denominator2);
         }
 
         // Create Recomendation Score

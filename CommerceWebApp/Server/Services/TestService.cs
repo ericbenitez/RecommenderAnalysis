@@ -7,7 +7,7 @@ namespace CommerceWebApp.Server.Services
 {
     public class TestService
     {
-        private List<string> fileNames;
+        private readonly List<string> fileNames;
         private Dictionary<string, MatrixInfo> matrices;
 
         public TestService()
@@ -30,11 +30,6 @@ namespace CommerceWebApp.Server.Services
             {
                 Console.WriteLine(RecommenderService.CalculatePredictedUserRatings(entry.Value.Matrix!));
             }
-
-            // var v1 = CreateVector.DenseOfArray(new double[] { 5, 3, 4, 4 });
-            // var v2 = CreateVector.DenseOfArray(new double[] { 3, 1, 2, 3});
-            // var ok = RecommenderService.calculateSimilarity(v1, v2);
-            // Console.WriteLine("similarity: " + ok);
         }
 
         public void buildMatrix(string filename)
