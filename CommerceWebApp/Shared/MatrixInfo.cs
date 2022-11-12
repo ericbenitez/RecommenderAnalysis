@@ -9,5 +9,6 @@ namespace CommerceWebApp.Shared
         public string[]? Users { get; set; }
         public string[]? Products { get; set; }
         public Matrix<double>? Matrix { get; set; }
+        public Matrix<double>? AdjustedMatrix {get; set;}
     }
 }

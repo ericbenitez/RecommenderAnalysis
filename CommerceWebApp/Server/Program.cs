@@ -10,7 +10,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<TestService>();
+builder.Services.AddSingleton<MatrixService>();
 
 var app = builder.Build();
 
@@ -20,7 +20,7 @@ if (app.Environment.IsDevelopment())
     app.UseWebAssemblyDebugging();
     app.UseSwagger();
     app.UseSwaggerUI();
-    
+
 }
 else
 {
@@ -41,6 +41,6 @@ app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 
-app.Services.GetService<TestService>();
+app.Services.GetService<MatrixService>();
 
 app.Run();
