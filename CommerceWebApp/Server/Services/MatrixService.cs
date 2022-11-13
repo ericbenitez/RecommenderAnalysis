@@ -9,34 +9,11 @@ namespace CommerceWebApp.Server.Services
     {
         public readonly static bool USE_PEARSON_PREDICTION = false;
         
-        private readonly List<string> fileNames;
         private Dictionary<string, MatrixInfo> matrices;
 
         public MatrixService()
         {
-            this.fileNames = new List<string>{
-                "test",
-                "test2",
-                "test3",
-                "testa"
-            };
-
             this.matrices = new Dictionary<string, MatrixInfo>();
-
-            foreach (string fileName in fileNames)
-            {
-                buildMatrix(fileName);
-            }
-
-            // foreach (KeyValuePair<string, MatrixInfo> entry in this.matrices)
-            // {
-            //     Console.WriteLine(entry.Value.AdjustedMatrix!);
-            // }
-
-            foreach (KeyValuePair<string, MatrixInfo> entry in this.matrices)
-            {
-                Console.WriteLine(RecommenderService.CalculatePredictedCosineRatingComplete(entry.Value.Matrix!, entry.Value.AdjustedMatrix!));
-            }
         }
 
         public void buildMatrix(string filename)
