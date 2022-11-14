@@ -4,27 +4,35 @@ namespace CommerceWebApp.Server.Services
 {
     public class RecommenderControlService
     {
+        private MatrixService matrixService;
 
-        public RecommenderControlService()
+        public RecommenderControlService(MatrixService matrixService)
         {
+            Console.WriteLine("asdas");
+            this.matrixService = matrixService;
+
+            string verificationMatrixFilename = "parsed-data-trimmed";
             List<string> fileNames = new List<string>{
                 "test",
                 "test2",
                 "test3",
-                "testa"
+                "testa",
+                verificationMatrixFilename
             };
-
-            MatrixService matrices = new MatrixService();
 
             foreach (string fileName in fileNames)
             {
-                matrices.buildMatrix(fileName);
+                matrixService.buildMatrix(fileName);
             }
 
             foreach (string filename in fileNames)
             {
-                MatrixInfo matrixInfo = matrices.getMatrix(filename);
+                MatrixInfo matrixInfo = matrixService.getMatrix(filename);
                 Console.WriteLine(RecommenderService.CalculatePredictedCosineRatingComplete(matrixInfo.Matrix!, matrixInfo.AdjustedMatrix!));
+            }
+
+            foreach (string filename in fileNames) {
+                RecommendationValidationService.CalculateMeanAbsoluteError(matrixService.getMatrix(filename));
             }
         }
 

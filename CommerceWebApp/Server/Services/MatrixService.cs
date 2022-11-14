@@ -18,24 +18,29 @@ namespace CommerceWebApp.Server.Services
 
         public void buildMatrix(string filename)
         {
+            int matrixStart = 3;
+            int amountOfUsers = 0;
+            int amountOfProducts = 0;
+            List<string> users = new();
+            List<string> products = new();
+
             string test1Data = System.IO.File.ReadAllText("Data/" + filename + ".txt").Trim();
             string[] rows = test1Data.Split("\n");
 
             string[] firstRow = rows[0].Split(" ");
-            int amountOfUsers = Int32.Parse(firstRow[0]);
-            int amountOfProducts = Int32.Parse(firstRow[1]);
+            amountOfUsers = Int32.Parse(firstRow[0]);
+            amountOfProducts = Int32.Parse(firstRow[1]);
 
-            string[] users = rows[1].Split(" ");
-            string[] products = rows[2].Split(" ");
-
+            users = rows[1].Split(" ").ToList();
+            products = rows[2].Split(" ").ToList();
 
             Matrix<double> matrix = Matrix<double>.Build.Dense(amountOfUsers, amountOfProducts);
-            for (int i = 3; i < rows.Length; i++)
+            for (int i = matrixStart; i < rows.Length; i++)
             {
-                var ratings = rows[i].Trim().Split(" ").ToList();
+                List<string> ratings = rows[i].Trim().Split(" ").ToList();
                 for (int j = 0; j < ratings.Count(); j++)
                 {
-                    matrix[i - 3, j] = Double.Parse(ratings[j]);
+                    matrix[i - matrixStart, j] = Double.Parse(ratings[j]);
                 }
             }
 
@@ -45,9 +50,11 @@ namespace CommerceWebApp.Server.Services
                 AmountOfProducts = amountOfProducts,
                 Users = users,
                 Products = products,
-                Matrix = matrix
+                Matrix = matrix,
+                UserAverages = new()
             });
 
+            computeUserAverages(filename);
             computeAdjustedMatrix(filename);
         }
 
@@ -56,17 +63,28 @@ namespace CommerceWebApp.Server.Services
             return matrices[fileName];
         }
 
-        private void computeAdjustedMatrix(String filename)
+        public void computeUserAverages(string filename) 
         {
-            Matrix<double> matrix = matrices[filename].Matrix!;
+            MatrixInfo m = matrices[filename];
+            Matrix<double> matrix = m.Matrix!;
+            for (int user = 0; user < matrix!.RowCount; user++) {
+                double userAverage = matrix.Row(user).Where(x => x > 0).ToList().Average();
+                m.UserAverages.Add(user, userAverage);
+            }
+        }
+
+        private void computeAdjustedMatrix(string filename)
+        {
+            MatrixInfo m = matrices[filename];
+            Matrix<double> matrix = m.Matrix!;
             Matrix<double> adjustedMatrix = Matrix<double>.Build.Dense(matrix.RowCount, matrix.ColumnCount);
 
             for (int user = 0; user < matrix.RowCount; user++)
             {
-                double userAverage = matrix.Row(user).Where(x => x > -1).ToList().Average();
+                double userAverage = m.UserAverages[user];
                 for (int product = 0; product < matrix.ColumnCount; product++)
                 {
-                    if (matrix[user, product] == -1)
+                    if (matrix[user, product] == 0)
                     {
                         adjustedMatrix[user, product] = double.NegativeInfinity;
                     }

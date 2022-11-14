@@ -7,7 +7,7 @@ namespace CommerceWebApp.Server.Services
     public class RecommendationValidationService
     {
 
-        public static double calculateMeanAverageError(MatrixInfo matrix, int groups)
+        public static double CalculateMeanAbsoluteError(MatrixInfo matrix)
         {
             return 0;
         }

@@ -1,4 +1,5 @@
 using MathNet.Numerics.LinearAlgebra;
+using System.Runtime.Intrinsics.X86;
 
 namespace CommerceWebApp.Server.Services
 {
@@ -13,7 +14,7 @@ namespace CommerceWebApp.Server.Services
             var userRatings = matrix.Row(user);
 
             //Gets the user's average
-            double userAverage = matrix.Row(user).Where(x => x > -1).ToList().Average();
+            double userAverage = matrix.Row(user).Where(x => x > 0).ToList().Average();
 
             double numerator = 0;
             double denominator = 0;
@@ -32,7 +33,7 @@ namespace CommerceWebApp.Server.Services
             Dictionary<int, double> neighbours = similarities.OrderByDescending(x => x.Value).Take(NEIGHBOURHOOD_SIZE).ToDictionary(x => x.Key, x => x.Value);
             foreach (KeyValuePair<int, double> neighbour in neighbours)
             {
-                double user2Average = matrix.Row(neighbour.Key).Where(x => x > -1).Average();
+                double user2Average = matrix.Row(neighbour.Key).Where(x => x > 0).Average();
 
                 //Gets similarity between users
                 numerator += (neighbour.Value * (matrix[neighbour.Key, product] - user2Average));
@@ -85,25 +86,30 @@ namespace CommerceWebApp.Server.Services
         // Calculates Similarity
         public static double CalculatePearsonSimilarity(Matrix<double> matrix, int user1, int user2)
         {
-            Matrix<double> goodMatrix = Matrix<double>.Build.Dense(matrix.RowCount, matrix.ColumnCount);
-            matrix.CopyTo(goodMatrix);
+            List<Vector<double>> rows = new() {
+                matrix.Row(user1),
+                matrix.Row(user2)
+            };
+
+            Matrix<double> goodMatrix = CreateMatrix.DenseOfRowVectors(rows);
+            
 
             //Remove products (columns) both users have not reviewed
             for (int product = matrix.ColumnCount - 1; product >= 0; product--)
             {
-                if (matrix[user1, product] == -1 || matrix[user2, product] == -1)
+                if (matrix[user1, product] == 0 || matrix[user2, product] == 0)
                 {
                     goodMatrix = goodMatrix.RemoveColumn(product);
                 }
             }
 
             // Calculate the ratings with the bad columns removed
-            var user1Ratings = goodMatrix.Row(user1);
-            var user2Ratings = goodMatrix.Row(user2);
+            var user1Ratings = goodMatrix.Row(0);
+            var user2Ratings = goodMatrix.Row(1);
 
             // Calculate average
-            var user1Average = matrix.Row(user1).Where(x => x > -1).ToList().Average();
-            var user2Average = matrix.Row(user2).Where(x => x > -1).ToList().Average();
+            var user1Average = matrix.Row(user1).Where(x => x > 0).ToList().Average();
+            var user2Average = matrix.Row(user2).Where(x => x > 0).ToList().Average();
 
             // Substract average from ratings
             var user1Adjusted = user1Ratings.Subtract(user1Average);
@@ -121,8 +127,11 @@ namespace CommerceWebApp.Server.Services
 
         public static double CalculateCosineSimilarity(Matrix<double> matrix, int product1, int product2)
         {
-            Matrix<double> goodMatrix = Matrix<double>.Build.Dense(matrix.RowCount, matrix.ColumnCount);
-            matrix.CopyTo(goodMatrix);
+            List<Vector<double>> columns = new() {
+                matrix.Column(product1),
+                matrix.Column(product2)
+            };
+            Matrix<double> goodMatrix = CreateMatrix.DenseOfColumnVectors(columns);
 
             for (int user = matrix.RowCount - 1; user >= 0; user--)
             {
@@ -132,8 +141,8 @@ namespace CommerceWebApp.Server.Services
                 }
             }
 
-            var product1Ratings = goodMatrix.Column(product1);
-            var product2Ratings = goodMatrix.Column(product2);
+            var product1Ratings = goodMatrix.Column(0);
+            var product2Ratings = goodMatrix.Column(1);
 
             var dotProduct = product1Ratings.DotProduct(product2Ratings);
 
@@ -147,12 +156,13 @@ namespace CommerceWebApp.Server.Services
         public static Matrix<double> CalculatePredictedUserRatings(Matrix<double> matrix, bool isPearsonPrediction)
         {
             Matrix<double> predictedUserRatings = Matrix<double>.Build.Dense(matrix.RowCount, matrix.ColumnCount);
+
             for (int user = 0; user < matrix.RowCount; user++)
             {
                 Vector<double> currentRow = matrix.Row(user);
                 for (int product = 0; product < matrix.ColumnCount; product++)
                 {
-                    if (isPearsonPrediction && matrix[user, product] == -1)
+                    if (isPearsonPrediction && matrix[user, product] == 0)
                     {
                         predictedUserRatings[user, product] = Math.Round(CalculatePearsonPrediction(matrix, user, product), 2);
                     }
@@ -181,10 +191,10 @@ namespace CommerceWebApp.Server.Services
 
             for (int user = 0; user < matrix.RowCount; user++)
             {
-                double userAverage = matrix.Row(user).Where(x => x > -1).ToList().Average();
+                double userAverage = matrix.Row(user).Where(x => x > 0).ToList().Average();
                 for (int product = 0; product < matrix.ColumnCount; product++)
                 {
-                    if (matrix[user, product] == -1)
+                    if (matrix[user, product] == 0)
                     {
                         goodMatrix[user, product] = adjustedMatrix[user, product] + userAverage;
                     }

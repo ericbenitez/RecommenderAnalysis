@@ -11,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<MatrixService>();
+builder.Services.AddSingleton<RecommenderControlService>();
 
 var app = builder.Build();
 
@@ -41,6 +42,6 @@ app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 
-app.Services.GetService<MatrixService>();
+app.Services.GetService<RecommenderControlService>();
 
 app.Run();
