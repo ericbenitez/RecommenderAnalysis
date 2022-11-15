@@ -13,11 +13,12 @@ namespace CommerceWebApp.Server.Services
 
             string verificationMatrixFilename = "parsed-data-trimmed";
             List<string> fileNames = new List<string>{
-                "test",
-                "test2",
-                "test3",
-                "testa",
-                verificationMatrixFilename
+                //"test",
+                //"test2",
+                //"test3",
+                //"testa",
+                //verificationMatrixFilename
+                "custom",
             };
 
             foreach (string fileName in fileNames)

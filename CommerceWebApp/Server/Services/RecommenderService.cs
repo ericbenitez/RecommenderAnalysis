@@ -93,6 +93,7 @@ namespace CommerceWebApp.Server.Services
 
             Matrix<double> goodMatrix = CreateMatrix.DenseOfRowVectors(rows);
             
+            
 
             //Remove products (columns) both users have not reviewed
             for (int product = matrix.ColumnCount - 1; product >= 0; product--)
@@ -127,29 +128,59 @@ namespace CommerceWebApp.Server.Services
 
         public static double CalculateCosineSimilarity(Matrix<double> matrix, int product1, int product2)
         {
-            List<Vector<double>> columns = new() {
-                matrix.Column(product1),
-                matrix.Column(product2)
-            };
-            Matrix<double> goodMatrix = CreateMatrix.DenseOfColumnVectors(columns);
+            //List<Vector<double>> columns = new() {
+            //    matrix.Column(product1),
+            //    matrix.Column(product2)
+            //};
+            
+            //var product1Vector = matrix.Column(product1);
+            //var product2Vector = matrix.Column(product2);
 
-            for (int user = matrix.RowCount - 1; user >= 0; user--)
+            List<double> product1Array = new List<double>();
+            List<double> product2Array = new List<double>();
+
+            //Matrix<double> goodMatrix = CreateMatrix.DenseOfColumnVectors(columns);
+
+            //for (int user = matrix.RowCount - 1; user >= 0; user--)
+            //{
+            //    if (double.IsNegativeInfinity(matrix[user, product1]) || double.IsNegativeInfinity(matrix[user, product2]))
+            //    {
+            //        goodMatrix = goodMatrix.RemoveRow(user);
+            //    }
+            //}
+
+            for (int user = 0; user < matrix.RowCount; user++)
             {
-                if (double.IsNegativeInfinity(matrix[user, product1]) || double.IsNegativeInfinity(matrix[user, product2]))
+                var product1Value = matrix[user, product1];
+                var product2Value = matrix[user, product2];
+
+                if (!(double.IsNegativeInfinity(product1Value) || double.IsNegativeInfinity(product2Value)))
                 {
-                    goodMatrix = goodMatrix.RemoveRow(user);
+                    product1Array.Add(product1Value);
+                    product2Array.Add(product2Value);
+                }
+
+                if ((!double.IsNegativeInfinity(product1Value) || !double.IsNegativeInfinity(product2Value)) && product1 == 0 && product2 == 68)
+                {
+                    Console.WriteLine("----------------------");
+                    Console.WriteLine(product1Value);
+                    Console.WriteLine(product2Value);
                 }
             }
 
-            var product1Ratings = goodMatrix.Column(0);
-            var product2Ratings = goodMatrix.Column(1);
+
+
+            var product1Ratings = Vector<double>.Build.DenseOfEnumerable(product1Array);
+            var product2Ratings = Vector<double>.Build.DenseOfEnumerable(product2Array);
 
             var dotProduct = product1Ratings.DotProduct(product2Ratings);
 
             var denominator1 = product1Ratings.L2Norm();
             var denominator2 = product2Ratings.L2Norm();
 
-            return dotProduct / (denominator1 * denominator2);
+            var asda = dotProduct / (denominator1 * denominator2);
+            
+            return asda; // nan
         }
 
         // Create Recomendation Score
