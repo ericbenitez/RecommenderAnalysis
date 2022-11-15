@@ -17,7 +17,7 @@ namespace CommerceWebApp.Server.Services
                 "test2",
                 "test3",
                 "testa",
-                "user-test",
+                //"user-test",
                 "parsed-data-trimmed"
             };
 
@@ -33,8 +33,9 @@ namespace CommerceWebApp.Server.Services
                 //Console.WriteLine(matrixInfo.AdjustedMatrix!);
             }
 
+            RecommendationValidationService verifier = new RecommendationValidationService(matrixService);
             foreach (string filename in fileNames) {
-                Console.WriteLine(RecommendationValidationService.CalculateMeanAbsoluteError(matrixService.getMatrix(filename)));
+                Console.WriteLine(verifier.CalculateMeanAbsoluteError(matrixService.getMatrix(filename)));
             }
         }
 

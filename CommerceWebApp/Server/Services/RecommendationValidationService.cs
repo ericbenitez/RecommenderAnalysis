@@ -6,8 +6,12 @@ namespace CommerceWebApp.Server.Services
 {
     public class RecommendationValidationService
     {
-
-        public static double CalculateMeanAbsoluteError(MatrixInfo matrixInfo)
+        private MatrixService matrixService;
+        public RecommendationValidationService(MatrixService ms) 
+        {
+            this.matrixService = ms;
+        }
+        public double CalculateMeanAbsoluteError(MatrixInfo matrixInfo)
         {
             Matrix<double> matrix = matrixInfo.Matrix!;
             double numeratorSum = 0;
@@ -21,6 +25,11 @@ namespace CommerceWebApp.Server.Services
                     {
                         double rating = matrix[user, product];
                         matrix[user, product] = 0;
+
+                        List<double> userRow = matrix.Row(user).Where(x => x > 0).ToList();
+                        matrixInfo.UserAverages[user] = userRow.Count() > 0 ? userRow.Average() : 1;
+                        matrixService.ComputeAdjustedRow(matrixInfo, matrix, matrixInfo.AdjustedMatrix!, user);
+
                         double prediction = RecommenderService.CalculateCosinePrediction(matrixInfo, user, product);
                         matrix[user, product] = rating;
                         

@@ -69,12 +69,18 @@ namespace CommerceWebApp.Server.Services
             MatrixInfo m = matrices[filename];
             Matrix<double> matrix = m.Matrix!;
             for (int user = 0; user < matrix!.RowCount; user++) {
-                double userAverage = matrix.Row(user).Where(x => x > 0).ToList().Average();
-                m.UserAverages!.Add(user, userAverage);
+                List<double> userRow = matrix.Row(user).Where(x => x > 0).ToList();
+                double userAverage = userRow.Count() > 0 ? userRow.Average() : 1;
+                if (!m.UserAverages!.ContainsKey(user)) {
+                    m.UserAverages!.Add(user, userAverage);
+                }
+                else {
+                    m.UserAverages![user] = userAverage;
+                }
             }
         }
 
-        private void computeAdjustedMatrix(string filename)
+        public void computeAdjustedMatrix(string filename)
         {
             MatrixInfo m = matrices[filename];
             Matrix<double> matrix = m.Matrix!;
@@ -97,6 +103,22 @@ namespace CommerceWebApp.Server.Services
             }
 
             matrices[filename].AdjustedMatrix = adjustedMatrix;
+        }
+
+        public void ComputeAdjustedRow(MatrixInfo m, Matrix<double> matrix, Matrix<double> adjustedMatrix, int user) 
+        {
+            double userAverage = m.UserAverages![user];
+            for (int product = 0; product < matrix.ColumnCount; product++)
+            {
+                if (matrix[user, product] == 0)
+                {
+                    adjustedMatrix[user, product] = double.NegativeInfinity;
+                }
+                else
+                {
+                    adjustedMatrix[user, product] = matrix[user, product] - userAverage;
+                }
+            }
         }
     }
 }

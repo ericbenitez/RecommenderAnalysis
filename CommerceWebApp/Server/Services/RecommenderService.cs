@@ -13,7 +13,7 @@ namespace CommerceWebApp.Server.Services
         {
             Matrix<double> matrix = matrixInfo.Matrix!;
 
-            //Get the user's ratings
+            //Get the user's ratings 
             var userRatings = matrix.Row(user);
 
             //Gets the user's average
@@ -34,7 +34,7 @@ namespace CommerceWebApp.Server.Services
                 similarities.Add(i, similarity);
             }
 
-            Dictionary<int, double> neighbours = similarities.OrderByDescending(x => x.Value).Take(NEIGHBOURHOOD_SIZE).ToDictionary(x => x.Key, x => x.Value);
+            Dictionary<int, double> neighbours = similarities.Where(x => x.Value > 0).OrderByDescending(x => x.Value).Take(NEIGHBOURHOOD_SIZE).ToDictionary(x => x.Key, x => x.Value);
             foreach (KeyValuePair<int, double> neighbour in neighbours)
             {
                 userRow = matrix.Row(neighbour.Key).Where(x => x > 0);
@@ -81,7 +81,7 @@ namespace CommerceWebApp.Server.Services
             }
 
             // GET NEIGHBOURS
-            Dictionary<int, double> neighbours = similarities.OrderByDescending(x => x.Value).Take(NEIGHBOURHOOD_SIZE).ToDictionary(x => x.Key, x => x.Value);
+            Dictionary<int, double> neighbours = similarities.Where(x => x.Value > 0).OrderByDescending(x => x.Value).Take(NEIGHBOURHOOD_SIZE).ToDictionary(x => x.Key, x => x.Value);
 
             // CALCULATE PREDICTION
             double numerator = 0;
@@ -102,8 +102,8 @@ namespace CommerceWebApp.Server.Services
                 prediction = average;
             }
 
-            prediction = prediction > 5 ? 5 : prediction;
-            prediction = prediction < 1 ? 1 : prediction;
+            //prediction = prediction > 5 ? 5 : prediction;
+            //prediction = prediction < 1 ? 1 : prediction;
 
             return prediction;
         }
