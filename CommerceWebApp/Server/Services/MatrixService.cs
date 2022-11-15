@@ -46,6 +46,7 @@ namespace CommerceWebApp.Server.Services
 
             matrices.Add(filename, new MatrixInfo()
             {
+                Name = filename,
                 AmountOfUsers = amountOfUsers,
                 AmountOfProducts = amountOfProducts,
                 Users = users,

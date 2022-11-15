@@ -4,6 +4,7 @@ namespace CommerceWebApp.Shared
 {
     public class MatrixInfo
     {
+        public string Name { get; set; }
         public int AmountOfUsers { get; set; }
         public int AmountOfProducts { get; set; }
         public List<string>? Users { get; set; }

@@ -26,12 +26,12 @@ namespace CommerceWebApp.Server.Services
                 matrixService.buildMatrix(fileName);
             }
 
-            //foreach (string filename in fileNames)
-            //{
-                //MatrixInfo matrixInfo = matrixService.getMatrix(filename);
-                //Console.WriteLine(RecommenderService.CalculatePredictedCosineRatingComplete(matrixInfo, matrixInfo.AdjustedMatrix!));
+            foreach (string filename in fileNames)
+            {
+                MatrixInfo matrixInfo = matrixService.getMatrix(filename);
+                //Console.WriteLine(RecommenderService.CalculatePredictedCosineRatingComplete(matrixInfo));
                 //Console.WriteLine(matrixInfo.AdjustedMatrix!);
-            //}
+            }
 
             foreach (string filename in fileNames) {
                 Console.WriteLine(RecommendationValidationService.CalculateMeanAbsoluteError(matrixService.getMatrix(filename)));
