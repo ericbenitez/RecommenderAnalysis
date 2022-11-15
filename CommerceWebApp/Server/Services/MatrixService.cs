@@ -19,8 +19,8 @@ namespace CommerceWebApp.Server.Services
         public void buildMatrix(string filename)
         {
             int matrixStart = 3;
-            int amountOfUsers = 0;
-            int amountOfProducts = 0;
+            int amountOfUsers;
+            int amountOfProducts;
             List<string> users = new();
             List<string> products = new();
 

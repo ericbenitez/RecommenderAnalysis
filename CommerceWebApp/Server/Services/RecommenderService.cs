@@ -9,13 +9,16 @@ namespace CommerceWebApp.Server.Services
         public readonly static int NEIGHBOURHOOD_SIZE = 5;
 
         // Calculates Prediction
-        public static double CalculatePearsonPrediction(Matrix<double> matrix, int user, int product)
+        public static double CalculatePearsonPrediction(MatrixInfo matrixInfo, int user, int product)
         {
+            Matrix<double> matrix = matrixInfo.Matrix!;
+
             //Get the user's ratings
             var userRatings = matrix.Row(user);
 
             //Gets the user's average
-            double userAverage = matrix.Row(user).Where(x => x > 0).ToList().Average();
+            var userRow = matrix.Row(user).Where(x => x > 0);
+            double userAverage = userRow.Count() > 0 ? userRow.ToList().Average() : 1;
 
             double numerator = 0;
             double denominator = 0;
@@ -27,14 +30,15 @@ namespace CommerceWebApp.Server.Services
                 if (i == user) continue;
 
                 //Gets similarity between users
-                double similarity = CalculatePearsonSimilarity(matrix, user, i);
+                double similarity = CalculatePearsonSimilarity(matrixInfo, user, i);
                 similarities.Add(i, similarity);
             }
 
             Dictionary<int, double> neighbours = similarities.OrderByDescending(x => x.Value).Take(NEIGHBOURHOOD_SIZE).ToDictionary(x => x.Key, x => x.Value);
             foreach (KeyValuePair<int, double> neighbour in neighbours)
             {
-                double user2Average = matrix.Row(neighbour.Key).Where(x => x > 0).Average();
+                userRow = matrix.Row(neighbour.Key).Where(x => x > 0);
+                double user2Average = userRow.Count() > 0 ? userRow.ToList().Average() : 0;
 
                 //Gets similarity between users
                 numerator += (neighbour.Value * (matrix[neighbour.Key, product] - user2Average));
@@ -44,11 +48,23 @@ namespace CommerceWebApp.Server.Services
             // Calculate the prediction
             double prediction = userAverage + (numerator / denominator);
 
+            if (double.IsNaN(prediction) || double.IsInfinity(prediction))
+            {
+                var list = matrix.Row(user).ToList().Where(x => x > 0).ToList();
+                double average = list.Count() > 0 ? list.Average() : 1;
+                prediction = average;
+            }
+
+            prediction = prediction > 5 ? 5 : prediction;
+            prediction = prediction < 1 ? 1 : prediction;
+
             return prediction;
         }
 
-        public static double CalculateCosinePrediction(Matrix<double> matrix, int user, int product)
+        public static double CalculateCosinePrediction(MatrixInfo matrixInfo, int user, int product)
         {
+            Matrix<double> matrix = matrixInfo.AdjustedMatrix!;
+
             // GET SIMILARITY BETWEEN PRODUCTS
             Dictionary<int, double> similarities = new();
             for (int i = 0; i < matrix.ColumnCount; i++)
@@ -59,13 +75,13 @@ namespace CommerceWebApp.Server.Services
                 //Gets similarity between products
                 if (!double.IsNegativeInfinity(matrix[user, i]))
                 {
-                    double similarity = CalculateCosineSimilarity(matrix, product, i);
+                    double similarity = CalculateCosineSimilarity(matrixInfo, product, i);
                     similarities.Add(i, similarity);
                 }
             }
 
             // GET NEIGHBOURS
-            Dictionary<int, double> neighbours = similarities.OrderByDescending(x => x.Value).Where(x => x.Value > 0).Take(NEIGHBOURHOOD_SIZE).ToDictionary(x => x.Key, x => x.Value);
+            Dictionary<int, double> neighbours = similarities.OrderByDescending(x => x.Value).Take(NEIGHBOURHOOD_SIZE).ToDictionary(x => x.Key, x => x.Value);
 
             // CALCULATE PREDICTION
             double numerator = 0;
@@ -80,44 +96,46 @@ namespace CommerceWebApp.Server.Services
 
             double prediction = numerator / denominator;
 
-            if (double.IsNaN(prediction)) {
-
+            if (double.IsNaN(prediction) || double.IsInfinity(prediction)) {
                 var list = matrix.Row(user).ToList().Where(x => x > 0).ToList();
-                double average = list.Count() > 0 ? list.Average() : 0;
+                double average = list.Count() > 0 ? list.Average() : 1;
                 prediction = average;
             }
+
+            prediction = prediction > 5 ? 5 : prediction;
+            prediction = prediction < 1 ? 1 : prediction;
 
             return prediction;
         }
 
         // Calculates Similarity
-        public static double CalculatePearsonSimilarity(Matrix<double> matrix, int user1, int user2)
+        public static double CalculatePearsonSimilarity(MatrixInfo matrixInfo, int user1, int user2)
         {
-            List<Vector<double>> rows = new() {
-                matrix.Row(user1),
-                matrix.Row(user2)
-            };
+            Matrix<double> matrix = matrixInfo.Matrix!;
 
-            Matrix<double> goodMatrix = CreateMatrix.DenseOfRowVectors(rows);
-            
-            
+            List<double> user1Array = new List<double>();
+            List<double> user2Array = new List<double>();
 
             //Remove products (columns) both users have not reviewed
             for (int product = matrix.ColumnCount - 1; product >= 0; product--)
             {
-                if (matrix[user1, product] == 0 || matrix[user2, product] == 0)
+                var user1Value = matrix[user1, product];
+                var user2Value = matrix[user2, product];
+
+                if (user1Value != 0 && user2Value != 0)
                 {
-                    goodMatrix = goodMatrix.RemoveColumn(product);
+                    user1Array.Add(user1Value);
+                    user2Array.Add(user2Value);
                 }
             }
 
             // Calculate the ratings with the bad columns removed
-            var user1Ratings = goodMatrix.Row(0);
-            var user2Ratings = goodMatrix.Row(1);
+            var user1Ratings = Vector<double>.Build.DenseOfEnumerable(user1Array);
+            var user2Ratings = Vector<double>.Build.DenseOfEnumerable(user2Array); ;
 
             // Calculate average
-            var user1Average = matrix.Row(user1).Where(x => x > 0).ToList().Average();
-            var user2Average = matrix.Row(user2).Where(x => x > 0).ToList().Average();
+            var user1Average = user1Array.Count() > 0 ? user1Array.ToList().Average() : 1;
+            var user2Average = user2Array.Count() > 0 ? user2Array.ToList().Average() : 1; ;
 
             // Substract average from ratings
             var user1Adjusted = user1Ratings.Subtract(user1Average);
@@ -133,8 +151,10 @@ namespace CommerceWebApp.Server.Services
             return dotProduct / (denominator1 * denominator2);
         }
 
-        public static double CalculateCosineSimilarity(Matrix<double> matrix, int product1, int product2)
+        public static double CalculateCosineSimilarity(MatrixInfo matrixInfo, int product1, int product2)
         {
+            Matrix<double> matrix = matrixInfo.AdjustedMatrix!;
+
             List<double> product1Array = new List<double>();
             List<double> product2Array = new List<double>();
 
@@ -164,8 +184,9 @@ namespace CommerceWebApp.Server.Services
         }
 
         // Create Recomendation Score
-        public static Matrix<double> CalculatePredictedUserRatings(Matrix<double> matrix, bool isPearsonPrediction)
+        public static Matrix<double> CalculatePredictedUserRatings(MatrixInfo matrixInfo, bool isPearsonPrediction)
         {
+            Matrix<double> matrix = matrixInfo.Matrix!;
             Matrix<double> predictedUserRatings = Matrix<double>.Build.Dense(matrix.RowCount, matrix.ColumnCount);
 
             for (int user = 0; user < matrix.RowCount; user++)
@@ -175,11 +196,11 @@ namespace CommerceWebApp.Server.Services
                 {
                     if (isPearsonPrediction && matrix[user, product] == 0)
                     {
-                        predictedUserRatings[user, product] = Math.Round(CalculatePearsonPrediction(matrix, user, product), 2);
+                        predictedUserRatings[user, product] = Math.Round(CalculatePearsonPrediction(matrixInfo, user, product), 2);
                     }
-                    else if (!isPearsonPrediction && double.IsNegativeInfinity(matrix[user, product]))
+                    else if (!isPearsonPrediction && matrix[user, product] == 0)
                     {
-                        predictedUserRatings[user, product] = Math.Round(CalculateCosinePrediction(matrix, user, product), 2);
+                        predictedUserRatings[user, product] = Math.Round(CalculateCosinePrediction(matrixInfo, user, product), 2);
                     }
                     else
                     {
@@ -191,12 +212,11 @@ namespace CommerceWebApp.Server.Services
             return predictedUserRatings;
         }
 
-        public static Matrix<double> CalculatePredictedCosineRatingComplete(MatrixInfo matrixInfo, Matrix<double> adjustedMatrix)
+        public static Matrix<double> CalculatePredictedCosineRatingComplete(MatrixInfo matrixInfo)
         {
             Matrix<double> matrix = matrixInfo.Matrix!;
-            adjustedMatrix = CalculatePredictedUserRatings(adjustedMatrix, false);
+            Matrix<double> adjustedMatrix = CalculatePredictedUserRatings(matrixInfo, false);
 
-            Vector<double> row2 = adjustedMatrix.Row(0);
             Matrix<double> goodMatrix = Matrix<double>.Build.Dense(matrix.RowCount, matrix.ColumnCount);
             matrix.CopyTo(goodMatrix);
 

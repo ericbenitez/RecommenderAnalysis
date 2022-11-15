@@ -21,9 +21,9 @@ namespace CommerceWebApp.Server.Services
                     {
                         double rating = matrix[user, product];
                         matrix[user, product] = 0;
-                        double prediction = RecommenderService.CalculateCosinePrediction(matrixInfo.AdjustedMatrix!, user, product);
+                        double prediction = RecommenderService.CalculateCosinePrediction(matrixInfo, user, product);
                         matrix[user, product] = rating;
-
+                        
                         double guess = prediction + userAverage;
                         numeratorSum += Math.Abs(guess - rating);
                         testSetSize++;
