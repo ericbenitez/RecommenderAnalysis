@@ -19,9 +19,5 @@
     <ProjectReference Include="..\Shared\CommerceWebApp.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Data\" />
-  </ItemGroup>
-
 
 </Project>

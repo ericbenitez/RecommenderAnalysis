@@ -69,7 +69,7 @@ namespace CommerceWebApp.Server.Services
             Matrix<double> matrix = m.Matrix!;
             for (int user = 0; user < matrix!.RowCount; user++) {
                 double userAverage = matrix.Row(user).Where(x => x > 0).ToList().Average();
-                m.UserAverages.Add(user, userAverage);
+                m.UserAverages!.Add(user, userAverage);
             }
         }
 
@@ -81,7 +81,7 @@ namespace CommerceWebApp.Server.Services
 
             for (int user = 0; user < matrix.RowCount; user++)
             {
-                double userAverage = m.UserAverages[user];
+                double userAverage = m.UserAverages![user];
                 for (int product = 0; product < matrix.ColumnCount; product++)
                 {
                     if (matrix[user, product] == 0)

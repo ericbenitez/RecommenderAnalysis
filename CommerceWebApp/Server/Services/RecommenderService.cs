@@ -1,3 +1,4 @@
+using CommerceWebApp.Shared;
 using MathNet.Numerics.LinearAlgebra;
 using System.Runtime.Intrinsics.X86;
 
@@ -5,12 +6,12 @@ namespace CommerceWebApp.Server.Services
 {
     public class RecommenderService
     {
-        public readonly static int NEIGHBOURHOOD_SIZE = 2;
+        public readonly static int NEIGHBOURHOOD_SIZE = 5;
 
         // Calculates Prediction
         public static double CalculatePearsonPrediction(Matrix<double> matrix, int user, int product)
         {
-            // Get the user's ratings
+            //Get the user's ratings
             var userRatings = matrix.Row(user);
 
             //Gets the user's average
@@ -48,7 +49,6 @@ namespace CommerceWebApp.Server.Services
 
         public static double CalculateCosinePrediction(Matrix<double> matrix, int user, int product)
         {
-            
             // GET SIMILARITY BETWEEN PRODUCTS
             Dictionary<int, double> similarities = new();
             for (int i = 0; i < matrix.ColumnCount; i++)
@@ -79,6 +79,13 @@ namespace CommerceWebApp.Server.Services
             }
 
             double prediction = numerator / denominator;
+
+            if (double.IsNaN(prediction)) {
+
+                var list = matrix.Row(user).ToList().Where(x => x > 0).ToList();
+                double average = list.Count() > 0 ? list.Average() : 0;
+                prediction = average;
+            }
 
             return prediction;
         }
@@ -128,47 +135,20 @@ namespace CommerceWebApp.Server.Services
 
         public static double CalculateCosineSimilarity(Matrix<double> matrix, int product1, int product2)
         {
-            //List<Vector<double>> columns = new() {
-            //    matrix.Column(product1),
-            //    matrix.Column(product2)
-            //};
-            
-            //var product1Vector = matrix.Column(product1);
-            //var product2Vector = matrix.Column(product2);
-
             List<double> product1Array = new List<double>();
             List<double> product2Array = new List<double>();
-
-            //Matrix<double> goodMatrix = CreateMatrix.DenseOfColumnVectors(columns);
-
-            //for (int user = matrix.RowCount - 1; user >= 0; user--)
-            //{
-            //    if (double.IsNegativeInfinity(matrix[user, product1]) || double.IsNegativeInfinity(matrix[user, product2]))
-            //    {
-            //        goodMatrix = goodMatrix.RemoveRow(user);
-            //    }
-            //}
 
             for (int user = 0; user < matrix.RowCount; user++)
             {
                 var product1Value = matrix[user, product1];
                 var product2Value = matrix[user, product2];
 
-                if (!(double.IsNegativeInfinity(product1Value) || double.IsNegativeInfinity(product2Value)))
+                if (!double.IsNegativeInfinity(product1Value) && !double.IsNegativeInfinity(product2Value))
                 {
                     product1Array.Add(product1Value);
                     product2Array.Add(product2Value);
                 }
-
-                if ((!double.IsNegativeInfinity(product1Value) || !double.IsNegativeInfinity(product2Value)) && product1 == 0 && product2 == 68)
-                {
-                    Console.WriteLine("----------------------");
-                    Console.WriteLine(product1Value);
-                    Console.WriteLine(product2Value);
-                }
             }
-
-
 
             var product1Ratings = Vector<double>.Build.DenseOfEnumerable(product1Array);
             var product2Ratings = Vector<double>.Build.DenseOfEnumerable(product2Array);
@@ -211,9 +191,9 @@ namespace CommerceWebApp.Server.Services
             return predictedUserRatings;
         }
 
-        public static Matrix<double> CalculatePredictedCosineRatingComplete(Matrix<double> matrix, Matrix<double> adjustedMatrix)
+        public static Matrix<double> CalculatePredictedCosineRatingComplete(MatrixInfo matrixInfo, Matrix<double> adjustedMatrix)
         {
-            Vector<double> row1 = adjustedMatrix.Row(0);
+            Matrix<double> matrix = matrixInfo.Matrix!;
             adjustedMatrix = CalculatePredictedUserRatings(adjustedMatrix, false);
 
             Vector<double> row2 = adjustedMatrix.Row(0);
@@ -222,7 +202,7 @@ namespace CommerceWebApp.Server.Services
 
             for (int user = 0; user < matrix.RowCount; user++)
             {
-                double userAverage = matrix.Row(user).Where(x => x > 0).ToList().Average();
+                double userAverage = matrixInfo.UserAverages![user];
                 for (int product = 0; product < matrix.ColumnCount; product++)
                 {
                     if (matrix[user, product] == 0)

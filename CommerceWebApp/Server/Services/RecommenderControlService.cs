@@ -13,12 +13,12 @@ namespace CommerceWebApp.Server.Services
 
             string verificationMatrixFilename = "parsed-data-trimmed";
             List<string> fileNames = new List<string>{
-                //"test",
-                //"test2",
-                //"test3",
-                //"testa",
-                //verificationMatrixFilename
-                "custom",
+                "test",
+                "test2",
+                "test3",
+                "testa",
+                "user-test",
+                "parsed-data-trimmed"
             };
 
             foreach (string fileName in fileNames)
@@ -29,11 +29,11 @@ namespace CommerceWebApp.Server.Services
             foreach (string filename in fileNames)
             {
                 MatrixInfo matrixInfo = matrixService.getMatrix(filename);
-                Console.WriteLine(RecommenderService.CalculatePredictedCosineRatingComplete(matrixInfo.Matrix!, matrixInfo.AdjustedMatrix!));
+                Console.WriteLine(RecommenderService.CalculatePredictedCosineRatingComplete(matrixInfo, matrixInfo.AdjustedMatrix!));
             }
 
             foreach (string filename in fileNames) {
-                RecommendationValidationService.CalculateMeanAbsoluteError(matrixService.getMatrix(filename));
+                Console.WriteLine(RecommendationValidationService.CalculateMeanAbsoluteError(matrixService.getMatrix(filename)));
             }
         }
 

@@ -11,6 +11,7 @@ namespace CommerceWebApp.Shared
         public Matrix<double>? Matrix { get; set; }
         public Matrix<double>? AdjustedMatrix {get; set;}
 
-        public Dictionary<int, double> UserAverages { get; set; }
+        public Dictionary<int, double>? UserAverages { get; set; }
+        public Dictionary<double, Dictionary<double, double>>? CosineSimilarityValues { get; set; }
     }
 }
