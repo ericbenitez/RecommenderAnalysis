@@ -235,5 +235,56 @@ namespace CommerceWebApp.Server.Services
             return goodMatrix;
         }
 
+        public static Dictionary<int, int> CountPaths(MatrixInfo matrixInfo, int user)
+        {
+            Dictionary<int, int> productCount = new Dictionary<int, int>();
+            int PATH_LENGTH = 3;
+
+            void recurseUser(int currentUser, int currentItem, int pathLength)
+            {
+                if (currentItem == matrixInfo.Matrix!.ColumnCount)
+                {
+                    return;
+                }
+
+                if (matrixInfo.Matrix![currentUser, currentItem] == 1)
+                {
+                    recurseItem(0, currentItem, pathLength + 1);
+                }
+
+                recurseUser(currentUser, currentItem + 1, pathLength);
+            }
+
+            void recurseItem(int currentUser, int currentItem, int pathLength) 
+            {
+                if (pathLength == PATH_LENGTH)
+                {
+                    if (productCount.ContainsKey(currentItem))
+                    {
+                        productCount[currentItem]++;
+                    }
+                    else if (matrixInfo.Matrix[user, currentItem] != 1)
+                    {
+                        productCount[currentItem] = 1;
+                    }
+                    return;
+                }
+                else if (currentUser == matrixInfo.Matrix.RowCount)
+                {
+                    return;
+                }
+                else if (currentUser != user &&  matrixInfo.Matrix[currentUser, currentItem] == 1) 
+                {
+                    recurseUser(currentUser, 0, pathLength + 1);
+                }
+
+                recurseItem(currentUser + 1, currentItem, pathLength);
+            }
+
+
+
+            recurseUser(user, 0, 0);
+            return productCount;
+        }
     }
 }

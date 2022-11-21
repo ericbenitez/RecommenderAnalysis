@@ -8,17 +8,21 @@ namespace CommerceWebApp.Server.Services
 
         public RecommenderControlService(MatrixService matrixService)
         {
-            Console.WriteLine("asdas");
             this.matrixService = matrixService;
 
             string verificationMatrixFilename = "parsed-data-trimmed";
             List<string> fileNames = new List<string>{
-                "test",
-                "test2",
-                "test3",
-                "testa",
+                //"test",
+                //"test2",
+                //"test3",
+                //"testa",
                 //"user-test",
-                "parsed-data-trimmed"
+                //"parsed-data-trimmed"
+                "sparse_test",
+                "sparse_test2",
+                "sparse_test3",
+                "sparse_test4",
+                "sparse_test5"
             };
 
             foreach (string fileName in fileNames)
@@ -28,14 +32,14 @@ namespace CommerceWebApp.Server.Services
 
             foreach (string filename in fileNames)
             {
+                Console.WriteLine("-----------------------");
+                Console.WriteLine(filename);
                 MatrixInfo matrixInfo = matrixService.getMatrix(filename);
-                //Console.WriteLine(RecommenderService.CalculatePredictedCosineRatingComplete(matrixInfo));
-                //Console.WriteLine(matrixInfo.AdjustedMatrix!);
-            }
-
-            RecommendationValidationService verifier = new RecommendationValidationService(matrixService);
-            foreach (string filename in fileNames) {
-                Console.WriteLine(verifier.CalculateMeanAbsoluteError(matrixService.getMatrix(filename)));
+                IEnumerable<KeyValuePair<int, int>> counts = RecommenderService.CountPaths(matrixInfo, matrixInfo.Users!.IndexOf("User1")).OrderByDescending(x => x.Value);
+                foreach (KeyValuePair<int, int> entry in counts) 
+                {
+                    Console.WriteLine($"{matrixInfo.Products![entry.Key]}: ({entry.Value})");
+                }
             }
         }
 
