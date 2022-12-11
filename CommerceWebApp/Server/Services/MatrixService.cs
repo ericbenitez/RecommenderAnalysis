@@ -55,13 +55,17 @@ namespace CommerceWebApp.Server.Services
                 Matrix = matrix,
                 UserAverages = new(),
                 CommonUserItems = new(),
-                ProductToUserMap = new()
+                ProductToUserMap = new(),
+                UserToProductMap = new(),
+                CommonItemUsers = new()
             });
 
             ComputeUserAverages(filename);
             ComputeAdjustedMatrix(filename);
             ComputeAllUserCombinations(filename);
             ComputeProductMap(filename);
+            ComputeAllProductCombinations(filename);
+            ComputeUserMap(filename);
         }
 
         public MatrixInfo GetMatrix(string fileName)
@@ -250,7 +254,7 @@ namespace CommerceWebApp.Server.Services
         public void ComputeAllProductCombinations(string filename)
         {
             MatrixInfo m = matrices[filename];
-            Matrix<double> matrix = m.Matrix!;
+            Matrix<double> matrix = m.AdjustedMatrix!;
             for (int product = 0; product < matrix!.ColumnCount; product++)
             {
                 CalculateProductCombinations(m, product);
@@ -259,7 +263,7 @@ namespace CommerceWebApp.Server.Services
 
         public void CalculateProductCombinations(MatrixInfo matrixInfo, int product)
         {
-            Matrix<double> matrix = matrixInfo.Matrix!;
+            Matrix<double> matrix = matrixInfo.AdjustedMatrix!;
 
             for (int product2 = 0; product2 < matrix.ColumnCount; product2++)
             {
@@ -273,7 +277,7 @@ namespace CommerceWebApp.Server.Services
                     var product1Value = matrix[user, product];
                     var product2Value = matrix[user, product2];
 
-                    if (product1Value != 0 && product2Value != 0)
+                    if (!double.IsNegativeInfinity(product1Value)  && !double.IsNegativeInfinity(product2Value))
                     {
                         productMap.Add(user, product1Value);
                     }
@@ -289,6 +293,27 @@ namespace CommerceWebApp.Server.Services
                 }
 
                 matrixInfo.CommonItemUsers![product][product2] = productMap;
+            }
+        }
+
+        public void ComputeUserMap(string filename)
+        {
+            MatrixInfo matrixInfo = matrices[filename];
+            Matrix<double> matrix = matrixInfo.AdjustedMatrix!;
+            for (int user = 0; user < matrix.RowCount; user++)
+            {
+                HashSet<int> userMap = new();
+
+                for (int product = 0; product < matrix.ColumnCount; product++)
+                {
+                    if (!double.IsNegativeInfinity(matrix[user, product]))
+                    {
+                        userMap.Add(product);
+                    }
+                }
+
+                matrixInfo.UserToProductMap!.Add(user, userMap);
+
             }
         }
 
@@ -318,23 +343,23 @@ namespace CommerceWebApp.Server.Services
         public void AddRatingProduct(MatrixInfo matrixInfo, int user, int product)
         {
             var userToProductMapping = matrixInfo.UserToProductMap!;
-            userToProductMapping[product].Add(user);
-
-            foreach (int productUser in matrixInfo.UserToProductMap![user])
+            userToProductMapping[user].Add(product);
+    
+            foreach (int otherProduct in matrixInfo.UserToProductMap![user])
             {
-                if (productUser == product) continue;
+                if (otherProduct == product) continue;
 
-                if (!matrixInfo.CommonItemUsers![product].ContainsKey(productUser))
+                if (!matrixInfo.CommonItemUsers![product].ContainsKey(otherProduct))
                 {
-                    matrixInfo.CommonItemUsers[product].Add(productUser, new Dictionary<int, double>());
+                    matrixInfo.CommonItemUsers[product].Add(otherProduct, new Dictionary<int, double>());
                 }
-                matrixInfo.CommonItemUsers[product][productUser].Add(user, matrixInfo.Matrix![user, product]);
+                matrixInfo.CommonItemUsers[product][otherProduct].Add(user, matrixInfo.AdjustedMatrix![user, product]);
 
-                if (!matrixInfo.CommonItemUsers![productUser].ContainsKey(user))
+                if (!matrixInfo.CommonItemUsers![otherProduct].ContainsKey(product))
                 {
-                    matrixInfo.CommonItemUsers[productUser].Add(product, new Dictionary<int, double>());
+                    matrixInfo.CommonItemUsers[otherProduct].Add(product, new Dictionary<int, double>());
                 }
-                matrixInfo.CommonItemUsers[productUser][product].Add(user, matrixInfo.Matrix![user, productUser]);
+                matrixInfo.CommonItemUsers[otherProduct][product].Add(user, matrixInfo.AdjustedMatrix![user, otherProduct]);
             }
         }
 

@@ -25,6 +25,7 @@ namespace CommerceWebApp.Server.Services
                     {
                         double rating = matrix[user, product];
                         matrix[user, product] = 0;
+                        matrixService.RemoveRatingProduct(matrixInfo, user, product);
 
                         if (product == 0 && user != 0) 
                         {
@@ -38,7 +39,8 @@ namespace CommerceWebApp.Server.Services
 
                         double prediction = RecommenderService.CalculateCosinePrediction(matrixInfo, user, product);
                         matrix[user, product] = rating;
-                        
+                        matrixService.AddRatingProduct(matrixInfo, user, product);
+
                         double guess = prediction + userAverage;
                         guess = guess < 1 ? 1 : guess;
                         guess = guess > 5 ? 5 : guess;

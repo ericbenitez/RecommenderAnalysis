@@ -206,22 +206,8 @@ namespace CommerceWebApp.Server.Services
 
         public static double CalculateCosineSimilarity(MatrixInfo matrixInfo, int product1, int product2)
         {
-            Matrix<double> matrix = matrixInfo.AdjustedMatrix!;
-
-            List<double> product1Array = new List<double>();
-            List<double> product2Array = new List<double>();
-
-            for (int user = 0; user < matrix.RowCount; user++)
-            {
-                var product1Value = matrix[user, product1];
-                var product2Value = matrix[user, product2];
-
-                if (!double.IsNegativeInfinity(product1Value) && !double.IsNegativeInfinity(product2Value))
-                {
-                    product1Array.Add(product1Value);
-                    product2Array.Add(product2Value);
-                }
-            }
+            List<double> product1Array = matrixInfo.CommonItemUsers![product1].ContainsKey(product2) ? matrixInfo.CommonItemUsers![product1][product2].Values.ToList() : new();
+            List<double> product2Array = matrixInfo.CommonItemUsers![product2].ContainsKey(product1) ? matrixInfo.CommonItemUsers![product2][product1].Values.ToList() : new();
 
             var product1Ratings = Vector<double>.Build.DenseOfEnumerable(product1Array);
             var product2Ratings = Vector<double>.Build.DenseOfEnumerable(product2Array);
