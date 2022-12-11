@@ -364,3 +364,5 @@ FodyWeavers.xsd
 
 # Node js junk
 package-lock.json
+package.json
+.vscode/

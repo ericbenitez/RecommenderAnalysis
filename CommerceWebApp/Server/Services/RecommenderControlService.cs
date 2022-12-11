@@ -33,6 +33,8 @@ namespace CommerceWebApp.Server.Services
             
             RecommendationValidationService verifier = new RecommendationValidationService(matrixService);
 
+            File.WriteAllText("Data/Experiment_Output.txt", String.Empty);
+
             foreach (string filename in fileNames)
             {
                 verifier.ExperimentTime(matrixService.GetMatrix(filename));

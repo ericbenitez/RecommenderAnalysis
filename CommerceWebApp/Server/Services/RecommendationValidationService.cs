@@ -2,6 +2,7 @@
 using MathNet.Numerics.LinearAlgebra;
 using System.Diagnostics;
 using MicroLibrary;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace CommerceWebApp.Server.Services
 {
@@ -94,6 +95,7 @@ namespace CommerceWebApp.Server.Services
 
         public void ExperimentTime(MatrixInfo matrixInfo) 
         {
+            string results = "";
             double mae;
             List<int> sizes = new List<int>(){2, 5, 10, 20};
             for (int algorithm = 1; algorithm < 3; algorithm++) 
@@ -141,6 +143,15 @@ namespace CommerceWebApp.Server.Services
                                         stopwatch.Stop();
                                         time = stopwatch.ElapsedMicroseconds;
 
+                                        results += $"Name={matrixInfo.Name},\n";
+                                        results += $"Negatives={setNegative},\n";
+                                        results += $"Alg={algorithm},\n";
+                                        results += $"Size={size},\n";
+                                        results += $"Method={method},\n";
+                                        results += $"Threshold={threshold},\n";
+                                        results += $"Microseconds={time},\n";
+                                        results += $"MAE={mae}\n";
+                                        results += "-----\n";
                                         Console.WriteLine($"Name: {matrixInfo.Name}");
                                         Console.WriteLine($"Negatives: {setNegative}");
                                         Console.WriteLine($"Alg: {algorithm}");
@@ -169,6 +180,15 @@ namespace CommerceWebApp.Server.Services
                                     stopwatch.Stop();
                                     time = stopwatch.ElapsedMicroseconds;
 
+                                    results += $"Name={matrixInfo.Name},\n";
+                                    results += $"Negatives={setNegative},\n";
+                                    results += $"Alg={algorithm},\n";
+                                    results += $"Size={size},\n";
+                                    results += $"Method={method},\n";
+                                    results += $"Threshold=0,\n";
+                                    results += $"Microseconds={time},\n";
+                                    results += $"MAE={mae}\n";
+                                    results += "-----\n";
                                     Console.WriteLine($"Name: {matrixInfo.Name}");
                                     Console.WriteLine($"Negatives: {setNegative}");
                                     Console.WriteLine($"Alg: {algorithm}");
@@ -186,6 +206,7 @@ namespace CommerceWebApp.Server.Services
                     }
                 }
             }
+            File.AppendAllText("Data/Experiment_Output.txt", results);
         }
 
     }
