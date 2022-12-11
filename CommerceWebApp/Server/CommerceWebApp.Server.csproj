@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.1" />
+    <PackageReference Include="MicroTimer" Version="1.0.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.17.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
@@ -17,6 +18,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Client\CommerceWebApp.Client.csproj" />
     <ProjectReference Include="..\Shared\CommerceWebApp.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Node\" />
   </ItemGroup>
 
 
