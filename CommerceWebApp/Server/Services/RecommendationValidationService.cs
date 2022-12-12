@@ -97,7 +97,7 @@ namespace CommerceWebApp.Server.Services
         {
             string results = "";
             double mae;
-            List<int> sizes = new List<int>(){2, 5, 10, 20};
+            List<int> sizes = new List<int>(){2, 5, 10, 20, 50, 100};
             for (int algorithm = 1; algorithm < 3; algorithm++) 
             {
                 foreach (int size in sizes)
