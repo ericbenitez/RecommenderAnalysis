@@ -1,0 +1,41 @@
+﻿The potential items of interest for each provided input file are listed below. The number in brackets indicates the number of paths of length 3 that lead from the user of interest (User1) to that item.
+
+test.txt:
+Item3 (2)
+
+test2.txt:
+Item3 (3)
+Item1 (1)
+
+test3.txt:
+Item2 (2)
+Item6 (2)
+Item8 (2)
+
+test4.txt:
+Item1 (4)
+Item5 (3)
+Item9 (3)
+Item6 (2)
+Item8 (2)
+Item3 (1)
+Item7 (1)
+
+test5.txt:
+Item46 (5)
+Item47 (4)
+Item13 (4)
+Item45 (4)
+Item12 (3)
+Item28 (3)
+Item44 (3)
+Item31 (2)
+Item11 (2)
+Item26 (2)
+Item24 (2)
+Item30 (2)
+Item48 (1)
+Item49 (1)
+Item2 (1)
+Item5 (1)
+Item29 (1)

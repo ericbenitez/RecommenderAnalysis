@@ -10,8 +10,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<ProductsService>();
-builder.Services.AddSingleton<OrdersService>();
+builder.Services.AddSingleton<MatrixService>();
+builder.Services.AddSingleton<RecommenderControlService>();
 
 var app = builder.Build();
 
@@ -21,7 +21,7 @@ if (app.Environment.IsDevelopment())
     app.UseWebAssemblyDebugging();
     app.UseSwagger();
     app.UseSwaggerUI();
-    
+
 }
 else
 {
@@ -41,5 +41,7 @@ app.UseAuthorization();
 app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
+
+app.Services.GetService<RecommenderControlService>();
 
 app.Run();
